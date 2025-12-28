@@ -1,0 +1,45 @@
+{
+  "name": "next_app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@fontsource/liu-jian-mao-cao": "^5.2.8",
+    "@fontsource/long-cang": "^5.2.8",
+    "@fontsource/lxgw-marker-gothic": "^5.2.2",
+    "@fontsource/lxgw-wenkai": "^5.2.5",
+    "@fontsource/ma-shan-zheng": "^5.2.8",
+    "@fontsource/noto-serif-sc": "^5.2.8",
+    "@fontsource/zcool-xiaowei": "^5.2.8",
+    "@fontsource/zhi-mang-xing": "^5.2.8",
+    "@resvg/resvg-js": "^2.6.2",
+    "@resvg/resvg-js-win32-x64-msvc": "^2.6.2",
+    "@supabase/supabase-js": "^2.89.0",
+    "autoprefixer": "^10.4.23",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
+    "lxgw-wenkai-screen-webfont": "^1.7.0",
+    "next": "14.2.16",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "satori": "^0.10.13",
+    "tailwind-merge": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.16",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
