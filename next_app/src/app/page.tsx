@@ -135,7 +135,7 @@ export default function Home() {
              <div>
                <label className="block text-sm font-medium text-stone-700 mb-2">选择风格</label>
                <div className="grid grid-cols-2 gap-3">
-                 {['kaishu', 'xingshu', 'caoshu', 'lishu', 'songti', 'wenkai'].map((s) => (
+                 {['kaishu', 'xingshu', 'caoshu', 'lishu', 'shoujin', 'niaochong'].map((s) => (
                    <button
                      key={s}
                      onClick={() => setStyle(s)}
@@ -150,8 +150,8 @@ export default function Home() {
                      {s === 'xingshu' && '行书 · 飘逸'}
                      {s === 'caoshu' && '草书 · 狂野'}
                      {s === 'lishu' && '隶书 · 古朴'}
-                     {s === 'songti' && '宋体 · 雅致'}
-                     {s === 'wenkai' && '文楷 · 温婉'}
+                     {s === 'shoujin' && '瘦金体 · 清冷'}
+                     {s === 'niaochong' && '鸟虫篆 · 绮丽'}
                    </button>
                  ))}
                </div>

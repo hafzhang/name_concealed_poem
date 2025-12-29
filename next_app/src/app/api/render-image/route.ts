@@ -33,68 +33,15 @@ const loadFont = (style: string) => {
       fontFile = 'zcool-xiaowei-chinese-simplified-400-normal.woff';
       fontName = 'ZcoolXiaoWei';
       break;
-    case 'songti':
-      fontPackage = '@fontsource/noto-serif-sc';
-      fontFile = 'noto-serif-sc-chinese-simplified-400-normal.woff';
-      fontName = 'NotoSerifSC';
+    case 'shoujin':
+      fontPackage = '@fontsource/ma-shan-zheng';
+      fontFile = 'files/ma-shan-zheng-chinese-simplified-400-normal.woff';
+      fontName = 'MaShanZheng';
       break;
-    case 'kuangcao':
-      fontPackage = '@fontsource/liu-jian-mao-cao';
-      fontFile = 'chinese-simplified-400.css'; // This seems to be a CSS file, let's check the structure again.
-      // Wait, ls output showed css files, let's check files subdirectory if it exists or if woff files are in root
-      // Checking liu-jian-mao-cao ls output again...
-      // It has chinese-simplified-400.css but no 'files' directory visible in the first level ls output?
-      // Ah, I missed the files listing for liu-jian-mao-cao.
-      // Let's assume standard structure or re-check.
-      // Actually, looking at previous ls output for liu-jian-mao-cao:
-      // - 400.css
-      // - chinese-simplified-400.css
-      // ...
-      // It DOES NOT seem to have a 'files' folder in the root listing provided.
-      // Wait, other packages had 'files' folder.
-      // I should double check liu-jian-mao-cao structure.
-      // For now, let's use lxgw-wenkai which I know has files.
-      fontPackage = '@fontsource/liu-jian-mao-cao'; 
-      fontFile = 'files/liu-jian-mao-cao-chinese-simplified-400-normal.woff'; // Guessing
-      fontName = 'LiuJianMaoCao';
-      break;
-    case 'wenkai':
-      fontPackage = 'lxgw-wenkai-screen-webfont';
-      fontFile = 'lxgwwenkaiscreen-subset-119.woff2'; // This is just a subset, we need the main file or merge subsets?
-      // Wait, lxgw-wenkai-screen-webfont splits font into many subset files. Satori might not support this easily if we need full coverage.
-      // Satori needs a single font file usually, or we load multiple.
-      // Loading 100+ files is bad.
-      // Let's check if there is a single woff2 file or if we can use another package.
-      // The @fontsource/lxgw-wenkai only had latin.
-      // Maybe we can try to find a package with a single file or use a CDN URL if possible (but we prefer local).
-      
-      // Let's check if lxgw-wenkai-screen-webfont has a full file?
-      // The ls output shows many subset files.
-      
-      // Alternative: Use a CDN for the font data fetch?
-      // Or try to install `lxgw-wenkai` (not @fontsource)?
-      // Let's try `npm install lxgw-wenkai` if it exists.
-      // Or maybe `lxgw-wenkai-lite-webfont` has fewer files?
-      
-      // Actually, for Satori, we need a single font file that covers the characters we need.
-      // Since we don't know the characters in advance (dynamic input), we need a full font.
-      
-      // Let's check if we can download a single .ttf/.otf file of LXGW WenKai from GitHub or similar source.
-      // But I cannot browse arbitrary URLs easily to find the link.
-      // I can try to use `lxgw-marker-gothic` which I installed and has `chinese-traditional`? 
-      // Wait, does it have simplified?
-      // `lxgw-marker-gothic-chinese-traditional-400-normal.woff`
-      // Usually Traditional includes Simplified characters visually? Or maybe not.
-      
-      // Let's try to fetch a known URL for LXGW WenKai Lite or Screen.
-      // https://github.com/lxgw/LxgwWenKai/releases/download/v1.330/LXGWWenKai-Regular.ttf
-      // I will try to download this file to public/fonts.
-      
-      fontName = 'LXGWWenKai';
-      // I will implement the download logic in a separate step or inside loadFont if file missing.
-      // For now, let's point to a path I will create.
-      fontPackage = 'local';
-      fontFile = 'LXGWWenKai-Regular.ttf';
+    case 'niaochong':
+      fontPackage = '@fontsource/long-cang';
+      fontFile = 'files/long-cang-chinese-simplified-400-normal.woff';
+      fontName = 'LongCang';
       break;
     case 'marker':
       fontPackage = '@fontsource/lxgw-marker-gothic';
