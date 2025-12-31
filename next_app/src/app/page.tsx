@@ -62,7 +62,8 @@ export default function Home() {
           poem: poemData.poem, 
           style, 
           bg: 'rice_paper',
-          frame 
+          frame,
+          name // Pass name for the seal
         })
       });
       const data = await res.json();
@@ -170,6 +171,10 @@ export default function Home() {
                 <option value="golden_wood">金丝楠木</option>
                 <option value="cloud_brocade">云纹锦缎</option>
                 <option value="modern_black">极简黑框</option>
+                <option value="sakura_pink">樱花漫舞 (粉)</option>
+                <option value="mint_green">清风竹影 (绿)</option>
+                <option value="lavender_mist">紫气东来 (紫)</option>
+                <option value="champagne_gold">流金岁月 (金)</option>
               </select>
              </div>
 
