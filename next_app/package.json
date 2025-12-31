@@ -9,13 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fontpkg/kouzan-brush-font": "^1.1.0",
+    "@fontpkg/source-han-serif-sc": "^2.3.3",
     "@fontsource/liu-jian-mao-cao": "^5.2.8",
     "@fontsource/long-cang": "^5.2.8",
     "@fontsource/lxgw-marker-gothic": "^5.2.2",
     "@fontsource/lxgw-wenkai": "^5.2.5",
+    "@fontsource/lxgw-wenkai-tc": "^5.2.8",
     "@fontsource/ma-shan-zheng": "^5.2.8",
     "@fontsource/noto-serif-sc": "^5.2.8",
     "@fontsource/zcool-xiaowei": "^5.2.8",
+    "@fontsource/zen-old-mincho": "^5.2.8",
     "@fontsource/zhi-mang-xing": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
     "@resvg/resvg-js-win32-x64-msvc": "^2.6.2",

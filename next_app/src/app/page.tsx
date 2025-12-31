@@ -151,7 +151,7 @@ export default function Home() {
                      {s === 'caoshu' && '草书 · 狂野'}
                      {s === 'lishu' && '隶书 · 古朴'}
                      {s === 'shoujin' && '瘦金体 · 清冷'}
-                     {s === 'niaochong' && '鸟虫篆 · 绮丽'}
+                     {s === 'niaochong' && '铭心宋 · 清雅'}
                    </button>
                  ))}
                </div>

@@ -19,29 +19,29 @@ const loadFont = (style: string) => {
       fontName = 'MaShanZheng';
       break;
     case 'xingshu':
-      fontPackage = '@fontsource/long-cang';
-      fontFile = 'long-cang-chinese-simplified-400-normal.woff';
-      fontName = 'LongCang';
-      break;
-    case 'caoshu':
       fontPackage = '@fontsource/zhi-mang-xing';
       fontFile = 'zhi-mang-xing-chinese-simplified-400-normal.woff';
       fontName = 'ZhiMangXing';
       break;
+    case 'caoshu':
+      fontPackage = '@fontsource/liu-jian-mao-cao';
+      fontFile = 'liu-jian-mao-cao-chinese-simplified-400-normal.woff';
+      fontName = 'LiuJianMaoCao';
+      break;
     case 'lishu':
-      fontPackage = '@fontsource/zcool-xiaowei';
-      fontFile = 'zcool-xiaowei-chinese-simplified-400-normal.woff';
-      fontName = 'ZcoolXiaoWei';
+      fontPackage = 'local';
+      fontFile = 'linhailishu.ttf';
+      fontName = 'LinHaiLiShu';
       break;
     case 'shoujin':
-      fontPackage = '@fontsource/ma-shan-zheng';
-      fontFile = 'files/ma-shan-zheng-chinese-simplified-400-normal.woff';
-      fontName = 'MaShanZheng';
+      fontPackage = 'local';
+      fontFile = 'ShouJin.ttf';
+      fontName = 'ShouJin';
       break;
     case 'niaochong':
-      fontPackage = '@fontsource/long-cang';
-      fontFile = 'files/long-cang-chinese-simplified-400-normal.woff';
-      fontName = 'LongCang';
+      fontPackage = 'local';
+      fontFile = 'LXGWHeartSerif.ttf';
+      fontName = 'LXGWHeartSerif';
       break;
     case 'marker':
       fontPackage = '@fontsource/lxgw-marker-gothic';
@@ -59,12 +59,14 @@ const loadFont = (style: string) => {
     : join(cwd, 'node_modules', fontPackage, 'files', fontFile);
   
   console.log(`Loading font ${fontName} from:`, fontPath);
-  
-  try {
-    return { name: fontName, data: readFileSync(fontPath) };
-  } catch (e) {
-    // Fallback to searching in local public folder if node_modules fails
-    console.error(`Failed to load font from ${fontPath}`, e);
+    
+    try {
+      const fontData = readFileSync(fontPath);
+      console.log(`Font ${fontName} loaded, size: ${fontData.byteLength} bytes`);
+      return { name: fontName, data: fontData };
+    } catch (e) {
+      // Fallback to searching in local public folder if node_modules fails
+      console.error(`Failed to load font from ${fontPath}`, e);
     // Fallback to NotoSerifSC if specific font fails
     try {
         // Try public/fonts/NotoSerifSC.otf first as it is more likely to be there in this env
@@ -95,6 +97,16 @@ export async function POST(req: Request) {
     }
 
     const fontInfo = loadFont(style);
+    
+    // Load fallback font (NotoSerifSC) to prevent blank text if main font fails or misses glyphs
+    let fallbackFontInfo = null;
+    if (fontInfo.name !== 'NotoSerifSC') {
+        try {
+            fallbackFontInfo = loadFont('default');
+        } catch (e) {
+            console.error('Failed to load fallback font', e);
+        }
+    }
 
     // Frame styles configuration
     const frameStyles: Record<string, any> = {
@@ -145,7 +157,7 @@ export async function POST(req: Request) {
                  style: {
                    display: 'flex',
                    flexDirection: 'row-reverse', // Right to left
-                   gap: '40px',
+                   gap: '50px',
                  },
                  children: poem.map((line: string, i: number) => ({
                     type: 'div',
@@ -154,16 +166,17 @@ export async function POST(req: Request) {
                       style: {
                         display: 'flex',
                         flexDirection: 'column', // Top to bottom
-                        fontSize: '48px',
+                        fontSize: '64px',
                         lineHeight: '1.2',
                         color: '#1c1917',
+                        fontFamily: fallbackFontInfo ? `${fontInfo.name}, ${fallbackFontInfo.name}` : fontInfo.name,
                       },
                       children: (line || '').split('').map((char, j) => ({
                         type: 'div',
                         key: `char-${j}`,
                         props: {
                           children: char || ' ',
-                          style: { marginBottom: '10px' }
+                          style: { marginBottom: '15px' }
                         }
                       }))
                     }
@@ -224,6 +237,12 @@ export async function POST(req: Request) {
             weight: 400,
             style: 'normal',
           },
+          ...(fallbackFontInfo ? [{
+            name: fallbackFontInfo.name,
+            data: fallbackFontInfo.data,
+            weight: 400,
+            style: 'normal',
+          } as const] : []),
         ],
       }
     );
