@@ -88,7 +88,15 @@ const loadFont = (style: string) => {
   }
 };
 
-import { appendFileSync } from 'fs';
+import { SilkScroll } from './mountings/SilkScroll';
+import { Redwood } from './mountings/Redwood';
+import { GoldenWood } from './mountings/GoldenWood';
+import { CloudBrocade } from './mountings/CloudBrocade';
+import { ModernBlack } from './mountings/ModernBlack';
+import { SakuraPink } from './mountings/SakuraPink';
+import { MintGreen } from './mountings/MintGreen';
+import { LavenderMist } from './mountings/LavenderMist';
+import { ChampagneGold } from './mountings/ChampagneGold';
 
 export async function POST(req: Request) {
   try {
@@ -123,236 +131,26 @@ export async function POST(req: Request) {
       
       switch (frameType) {
         // --- Traditional / Classic Styles ---
-        case 'silk_scroll': // 绫罗卷轴 (Upgraded)
-          return {
-            type: 'div',
-            props: {
-              style: { ...commonStyle, backgroundColor: '#f5f5f4', flexDirection: 'column', justifyContent: 'space-between' },
-              children: [
-                // Top Scroll Bar
-                { type: 'div', props: { style: { width: '100%', height: '20px', backgroundColor: '#4a4a4a', borderRadius: '10px 10px 0 0', boxShadow: '0 2px 5px rgba(0,0,0,0.3)' } } },
-                // Top Silk Section
-                { type: 'div', props: { style: { width: '100%', height: '80px', backgroundColor: '#d6d3d1', borderBottom: '2px solid #a8a29e', backgroundImage: 'linear-gradient(45deg, #d6d3d1 25%, #e7e5e4 25%, #e7e5e4 50%, #d6d3d1 50%, #d6d3d1 75%, #e7e5e4 75%, #e7e5e4 100%)', backgroundSize: '20px 20px' } } },
-                // Content Area (Paper)
-                {
-                  type: 'div',
-                  props: {
-                    style: { display: 'flex', flex: 1, width: '100%', backgroundColor: '#fffbf0', padding: '40px', justifyContent: 'center', alignItems: 'center', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)' },
-                    children
-                  }
-                },
-                // Bottom Silk Section
-                { type: 'div', props: { style: { width: '100%', height: '80px', backgroundColor: '#d6d3d1', borderTop: '2px solid #a8a29e', backgroundImage: 'linear-gradient(45deg, #d6d3d1 25%, #e7e5e4 25%, #e7e5e4 50%, #d6d3d1 50%, #d6d3d1 75%, #e7e5e4 75%, #e7e5e4 100%)', backgroundSize: '20px 20px' } } },
-                // Bottom Scroll Bar (Roller)
-                { type: 'div', props: { style: { width: '100%', height: '30px', backgroundColor: '#4a4a4a', borderRadius: '0 0 15px 15px', boxShadow: '0 -2px 5px rgba(0,0,0,0.3)' } } },
-              ]
-            }
-          };
-        case 'redwood': // 红木画框 (Upgraded)
-          return {
-            type: 'div',
-            props: {
-              style: { ...commonStyle, backgroundColor: '#451a03', border: '25px solid #451a03', borderRadius: '4px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' },
-              children: [
-                // Inner Gold Trim
-                { type: 'div', props: { style: { position: 'absolute', top: '0', left: '0', right: '0', bottom: '0', border: '2px solid #b45309' } } },
-                // Inner Matting (Beige)
-                {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', backgroundColor: '#fef3c7', padding: '30px', justifyContent: 'center', alignItems: 'center', border: '5px solid #78350f' },
-                     children: [
-                        // Content Background
-                        {
-                          type: 'div',
-                          props: {
-                            style: { display: 'flex', width: '100%', height: '100%', backgroundColor: '#fffbeb', justifyContent: 'center', alignItems: 'center', boxShadow: '0 0 10px rgba(0,0,0,0.2)' },
-                            children
-                          }
-                        }
-                     ]
-                   }
-                }
-              ]
-            }
-          };
-        case 'golden_wood': // 金丝楠木 (Upgraded)
-          return {
-            type: 'div',
-            props: {
-              style: { ...commonStyle, backgroundColor: '#b45309', border: '20px solid #b45309' },
-              children: [
-                 // Ornate Gold Pattern (Simplified)
-                 { type: 'div', props: { style: { position: 'absolute', top: '5px', left: '5px', right: '5px', bottom: '5px', border: '5px solid #fbbf24' } } },
-                 // Content
-                 {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', backgroundColor: '#fff7ed', padding: '40px', justifyContent: 'center', alignItems: 'center' },
-                     children
-                   }
-                 }
-              ]
-            }
-          };
-        case 'cloud_brocade': // 云纹锦缎 (Upgraded)
-            return {
-              type: 'div',
-              props: {
-                style: { ...commonStyle, backgroundColor: '#9f1239', border: '15px solid #881337' },
-                children: [
-                   // Inner Gold Border
-                   {
-                     type: 'div',
-                     props: { style: { position: 'absolute', top: '20px', left: '20px', right: '20px', bottom: '20px', border: '2px solid #fcd34d' } }
-                   },
-                   // Cloud Pattern Corners (Simulated with circles)
-                   { type: 'div', props: { style: { position: 'absolute', top: '15px', left: '15px', width: '30px', height: '30px', borderRadius: '50%', border: '2px solid #fcd34d', borderRightColor: 'transparent', borderBottomColor: 'transparent', transform: 'rotate(-45deg)' } } },
-                   { type: 'div', props: { style: { position: 'absolute', top: '15px', right: '15px', width: '30px', height: '30px', borderRadius: '50%', border: '2px solid #fcd34d', borderLeftColor: 'transparent', borderBottomColor: 'transparent', transform: 'rotate(45deg)' } } },
-                   { type: 'div', props: { style: { position: 'absolute', bottom: '15px', left: '15px', width: '30px', height: '30px', borderRadius: '50%', border: '2px solid #fcd34d', borderRightColor: 'transparent', borderTopColor: 'transparent', transform: 'rotate(-135deg)' } } },
-                   { type: 'div', props: { style: { position: 'absolute', bottom: '15px', right: '15px', width: '30px', height: '30px', borderRadius: '50%', border: '2px solid #fcd34d', borderLeftColor: 'transparent', borderTopColor: 'transparent', transform: 'rotate(135deg)' } } },
-                   // Content Background (Rice Paper)
-                   {
-                     type: 'div',
-                     props: {
-                       style: { display: 'flex', width: '90%', height: '90%', backgroundColor: '#f5f5f4', padding: '40px', justifyContent: 'center', alignItems: 'center', boxShadow: '0 0 20px rgba(0,0,0,0.3)' },
-                       children
-                     }
-                   }
-                ]
-              }
-            };
-        case 'modern_black': // 极简黑框 (Upgraded)
-          return {
-            type: 'div',
-            props: {
-              style: { ...commonStyle, backgroundColor: '#1c1917', border: '20px solid #1c1917' },
-              children: [
-                 // White Matting
-                 {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', backgroundColor: '#ffffff', padding: '60px', justifyContent: 'center', alignItems: 'center' },
-                     children: [
-                        // Inner Thin Line
-                        {
-                          type: 'div',
-                          props: {
-                            style: { display: 'flex', width: '100%', height: '100%', border: '1px solid #e5e5e5', justifyContent: 'center', alignItems: 'center', padding: '20px' },
-                            children
-                          }
-                        }
-                     ]
-                   }
-                 }
-              ]
-            }
-          };
+        case 'silk_scroll': // 绫罗卷轴
+          return SilkScroll({ children });
+        case 'redwood': // 红木画框
+          return Redwood({ children });
+        case 'golden_wood': // 金丝楠木
+          return GoldenWood({ children });
+        case 'cloud_brocade': // 云纹锦缎
+            return CloudBrocade({ children });
+        case 'modern_black': // 极简黑框
+          return ModernBlack({ children });
 
         // --- Girl-Friendly Styles ---
         case 'sakura_pink': // 樱花漫舞
-           return {
-             type: 'div',
-             props: {
-               style: { ...commonStyle, backgroundColor: '#fff1f2', border: '20px solid #fecdd3' },
-               children: [
-                 // Decorative Inner Border
-                 {
-                   type: 'div',
-                   props: { style: { position: 'absolute', top: '15px', left: '15px', right: '15px', bottom: '15px', border: '1px solid #fda4af' } }
-                 },
-                 // Corner Petals (Top Left)
-                 { type: 'div', props: { style: { position: 'absolute', top: '10px', left: '10px', width: '16px', height: '16px', borderRadius: '50%', backgroundColor: '#fbcfe8' } } },
-                 { type: 'div', props: { style: { position: 'absolute', top: '22px', left: '8px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#f9a8d4' } } },
-                 { type: 'div', props: { style: { position: 'absolute', top: '8px', left: '22px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#f9a8d4' } } },
-                 // Corner Petals (Bottom Right)
-                 { type: 'div', props: { style: { position: 'absolute', bottom: '10px', right: '10px', width: '16px', height: '16px', borderRadius: '50%', backgroundColor: '#fbcfe8' } } },
-                 { type: 'div', props: { style: { position: 'absolute', bottom: '22px', right: '8px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#f9a8d4' } } },
-                 { type: 'div', props: { style: { position: 'absolute', bottom: '8px', right: '22px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#f9a8d4' } } },
-                 // Content Container
-                 {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', padding: '40px', justifyContent: 'center', alignItems: 'center' },
-                     children
-                   }
-                 }
-               ]
-             }
-           };
+           return SakuraPink({ children });
         case 'mint_green': // 清风竹影
-           return {
-             type: 'div',
-             props: {
-               style: { ...commonStyle, backgroundColor: '#f0fdf4', border: '20px solid #bbf7d0' },
-               children: [
-                 // Inner Dashed Border
-                 {
-                   type: 'div',
-                   props: { style: { position: 'absolute', top: '20px', left: '20px', right: '20px', bottom: '20px', border: '2px dashed #86efac' } }
-                 },
-                 // Bamboo Joint Decorations (Simple Lines)
-                 { type: 'div', props: { style: { position: 'absolute', top: '50%', left: '0', width: '20px', height: '2px', backgroundColor: '#86efac' } } },
-                 { type: 'div', props: { style: { position: 'absolute', top: '50%', right: '0', width: '20px', height: '2px', backgroundColor: '#86efac' } } },
-                 // Content
-                 {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', padding: '40px', justifyContent: 'center', alignItems: 'center' },
-                     children
-                   }
-                 }
-               ]
-             }
-           };
+           return MintGreen({ children });
         case 'lavender_mist': // 紫气东来
-           return {
-             type: 'div',
-             props: {
-               style: { ...commonStyle, backgroundColor: '#faf5ff', border: '20px solid #e9d5ff' },
-               children: [
-                 // Inner Rounded Border
-                 {
-                   type: 'div',
-                   props: { style: { position: 'absolute', top: '25px', left: '25px', right: '25px', bottom: '25px', border: '1px solid #d8b4fe', borderRadius: '20px' } }
-                 },
-                 // Content
-                 {
-                   type: 'div',
-                   props: {
-                     style: { display: 'flex', width: '100%', height: '100%', padding: '40px', justifyContent: 'center', alignItems: 'center' },
-                     children
-                   }
-                 }
-               ]
-             }
-           };
-        case 'champagne_gold': // 流金岁月 (Upgraded)
-            return {
-              type: 'div',
-              props: {
-                style: { ...commonStyle, backgroundColor: '#fffbeb', border: '20px solid #fde68a' },
-                children: [
-                  // Double Inner Border - using standard border instead of double which might be failing in Satori
-                  {
-                    type: 'div',
-                    props: { style: { position: 'absolute', top: '15px', left: '15px', right: '15px', bottom: '15px', border: '4px solid #fbbf24' } }
-                  },
-                   {
-                    type: 'div',
-                    props: { style: { position: 'absolute', top: '23px', left: '23px', right: '23px', bottom: '23px', border: '1px solid #fbbf24' } }
-                  },
-                  // Content
-                  {
-                    type: 'div',
-                    props: {
-                      style: { display: 'flex', width: '100%', height: '100%', padding: '40px', justifyContent: 'center', alignItems: 'center' },
-                      children
-                    }
-                  }
-                ]
-              }
-            };
+           return LavenderMist({ children });
+        case 'champagne_gold': // 流金岁月
+            return ChampagneGold({ children });
         
         default: // 'none' and fallback
            return {

@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "description": "Trae AI Agent Hooks Configuration - Imitating Claude Code Safety Mechanisms",
+    "version": "1.0.0"
+  },
+  "hooks": {
+    "execution_policy": {
+      "block_high_risk_commands": true,
+      "require_confirmation_for": [
+        "rm -rf",
+        "drop database",
+        "aws s3 delete",
+        "git push --force"
+      ],
+      "allowed_directories": [
+        "src",
+        "docs",
+        "scripts",
+        "next_app"
+      ]
+    },
+    "pre_workflow": [
+      {
+        "id": "check-node-version",
+        "command": "node -v",
+        "expected_pattern": "v18|v20",
+        "on_failure": "warn",
+        "message": "Warning: Node version might be incompatible. Recommended: v18 or v20."
+      },
+      {
+        "id": "validate-env",
+        "trigger": "npm run dev",
+        "action": "check_file_exists",
+        "target": ".env.local",
+        "message": "Missing .env.local file. Please create it from .env.example."
+      }
+    ],
+    "pre_commit_checks": [
+      {
+        "id": "lint-check",
+        "command": "npm run lint",
+        "blocking": true,
+        "description": "Ensure code quality standards are met"
+      },
+      {
+        "id": "type-check",
+        "command": "tsc --noEmit",
+        "blocking": true,
+        "description": "Verify TypeScript types"
+      },
+      {
+        "id": "no-secrets",
+        "pattern": "(sk-[a-zA-Z0-9]{32,})|(ghp_[a-zA-Z0-9]{30,})",
+        "scope": "staged_files",
+        "action": "block",
+        "message": "Potential API key detected in commit. Please use environment variables."
+      }
+    ],
+    "code_quality_gates": {
+      "files": "**/*.{ts,tsx}",
+      "rules": [
+        {
+          "pattern": "console\\.log\\(",
+          "level": "warning",
+          "message": "Please remove console.log before production."
+        },
+        {
+          "pattern": "any",
+          "level": "error",
+          "context": "typescript",
+          "message": "Avoid using 'any' type. Be explicit."
+        },
+        {
+          "pattern": "TODO:",
+          "level": "info",
+          "message": "Reminder: You have unresolved TODOs."
+        }
+      ]
+    },
+    "post_action_reports": {
+      "enable_summary": true,
+      "metrics": ["files_changed", "lines_added", "errors_encountered"]
+    },
+    "task_completion_gates": {
+      "mounting_refactor": {
+        "description": "Refactor mounting styles into independent files with high artistic detail.",
+        "criteria": [
+          {
+            "type": "file_structure",
+            "path": "next_app/src/app/api/render-image/mountings/*.{ts,tsx}",
+            "min_files": 8
+          },
+          {
+            "type": "content_length",
+            "path": "next_app/src/app/api/render-image/mountings/*.{ts,tsx}",
+            "min_lines": 1000,
+            "exclude": ["*NoFrame*"]
+          }
+        ]
+      }
+    }
+  }
+}
