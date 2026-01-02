@@ -14,9 +14,9 @@ const loadFont = (style: string) => {
   // Map styles to fonts
   switch (style) {
     case 'kaishu':
-      fontPackage = '@fontsource/ma-shan-zheng';
-      fontFile = 'ma-shan-zheng-chinese-simplified-400-normal.woff';
-      fontName = 'MaShanZheng';
+      fontPackage = 'local';
+      fontFile = 'kaishu.ttf';
+      fontName = 'KaiShu';
       break;
     case 'xingshu':
       fontPackage = '@fontsource/zhi-mang-xing';
@@ -30,8 +30,8 @@ const loadFont = (style: string) => {
       break;
     case 'lishu':
       fontPackage = 'local';
-      fontFile = 'linhailishu.ttf';
-      fontName = 'LinHaiLiShu';
+      fontFile = 'qingliaolishu.ttf';
+      fontName = 'QingLiaoLiShu';
       break;
     case 'shoujin':
       fontPackage = 'local';
@@ -39,9 +39,14 @@ const loadFont = (style: string) => {
       fontName = 'ShouJin';
       break;
     case 'niaochong':
+      fontPackage = '@fontsource/zcool-xiaowei';
+      fontFile = 'zcool-xiaowei-chinese-simplified-400-normal.woff';
+      fontName = 'ZcoolXiaoWei';
+      break;
+    case 'mianhua':
       fontPackage = 'local';
-      fontFile = 'LXGWHeartSerif.ttf';
-      fontName = 'LXGWHeartSerif';
+      fontFile = 'mianhuatang.ttf';
+      fontName = 'mianhuatang';
       break;
     case 'marker':
       fontPackage = '@fontsource/lxgw-marker-gothic';
