@@ -2,6 +2,27 @@
   "name": "next_app",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "onStartup",
+    "onCommand:trae.beautifier.start",
+    "onCommand:trae.pipeline.start"
+  ],
+  "main": "./.trae/extensions/editor-helper.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "trae.beautifier.start",
+        "title": "Beautifier: Start long-running"
+      },
+      {
+        "command": "trae.pipeline.start",
+        "title": "Pipeline: Start long-running"
+      }
+    ]
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
