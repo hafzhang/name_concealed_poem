@@ -93,7 +93,7 @@ const COLORS = {
   silkMain: '#d6d3d1',
   silkHighlight: '#e7e5e4',
   silkShadow: '#a8a29e',
-  goldThread: 'rgba(255, 215, 0, 0.4)',
+  goldThread: 'rgba(255,215,0,0.4)',
   knobDark: '#1a1a1a',
   knobLight: '#4a4a4a',
   paperBg: '#fffbf0',

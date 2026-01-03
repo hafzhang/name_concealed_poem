@@ -584,7 +584,7 @@ export const CloudBrocade = ({ children }: MountingProps) => {
               position: 'relative',
               width: '85%',
               height: '85%',
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: 'rgba(255,255,255,0.95)',
               borderRadius: '4px',
               display: 'flex',
               flexDirection: 'column',

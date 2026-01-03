@@ -386,11 +386,11 @@ const generateSakuraGradient = () => {
  */
 const generatePetalPattern = () => {
   return `
-    radial-gradient(circle at 10% 20%, rgba(244, 114, 182, 0.4) 2px, transparent 3px), 
-    radial-gradient(circle at 30% 60%, rgba(244, 114, 182, 0.4) 3px, transparent 4px), 
-    radial-gradient(circle at 70% 40%, rgba(244, 114, 182, 0.4) 2px, transparent 3px), 
-    radial-gradient(circle at 90% 80%, rgba(244, 114, 182, 0.4) 4px, transparent 5px), 
-    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.8) 5px, transparent 8px)
+    radial-gradient(circle at 10% 20%, rgba(244,114,182,0.4) 2px, transparent 3px), 
+    radial-gradient(circle at 30% 60%, rgba(244,114,182,0.4) 3px, transparent 4px), 
+    radial-gradient(circle at 70% 40%, rgba(244,114,182,0.4) 2px, transparent 3px), 
+    radial-gradient(circle at 90% 80%, rgba(244,114,182,0.4) 4px, transparent 5px), 
+    radial-gradient(ellipse at 50% 10%, rgba(255,255,255,0.8) 5px, transparent 8px)
   `.trim().replace(/\s+/g, ' ');
 };
 
@@ -409,7 +409,7 @@ const createFlower = (x: string, y: string, size: number, color: string) => {
         height: `${size}px`,
         borderRadius: '50%',
         backgroundColor: color,
-        boxShadow: `0 0 ${size/2}px rgba(249, 168, 212, 0.8)`,
+        boxShadow: `0 0 ${size/2}px rgba(249,168,212,0.8)`,
         zIndex: 3
       }
     }
@@ -471,7 +471,7 @@ export const SakuraPink = ({ children }: MountingProps) => {
     height: '100%',
     background: sakuraGradient,
     backgroundImage: `${petalPattern}, ${sakuraGradient}`,
-    boxShadow: '0 10px 25px rgba(244, 114, 182, 0.2)',
+    boxShadow: '0 10px 25px rgba(244,114,182,0.2)',
     border: '10px solid #fce7f3',
     zIndex: 1,
   };
@@ -486,7 +486,7 @@ export const SakuraPink = ({ children }: MountingProps) => {
     borderRadius: '15px',
     zIndex: 2,
     pointerEvents: 'none',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: 'rgba(255,255,255,0.3)',
   };
 
   const contentAreaStyle: any = {
@@ -501,7 +501,7 @@ export const SakuraPink = ({ children }: MountingProps) => {
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 2,
-    boxShadow: '0 4px 15px rgba(244, 114, 182, 0.15)',
+    boxShadow: '0 4px 15px rgba(244,114,182,0.15)',
     backgroundImage: 'linear-gradient(to bottom right, #fff 0%, #fff1f2 100%)',
   };
 

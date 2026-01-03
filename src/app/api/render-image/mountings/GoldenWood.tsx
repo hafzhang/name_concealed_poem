@@ -67,10 +67,10 @@ const INLAYS = {
 const MATERIALS = {
   woodBase: '#b45309', // Golden Brown
   woodGrain: '#d97706', // Gold/Amber
-  woodShimmer: 'rgba(255, 215, 0, 0.15)', // Golden sheen
+  woodShimmer: 'rgba(255,215,0,0.15)', // Golden sheen
   woodHighlight: '#78350f', // Lighter grain
   woodShadow: '#280f01', // Deep crevices
-  varnish: 'rgba(255, 200, 150, 0.1)', // Shiny top coat
+  varnish: 'rgba(255,200,150,0.1)', // Shiny top coat
   jade: '#10b981', // Green
   whiteJade: '#f0fdf4', // Milky white
   coral: '#ef4444', // Red
@@ -130,10 +130,10 @@ const RenderGoldenThreads = () => {
             top: `${t.y}%`,
             width: `${t.length}px`,
             height: '1px',
-            backgroundColor: 'rgba(255, 223, 0, 0.6)', // Bright Gold
+            backgroundColor: 'rgba(255,223,0,0.6)', // Bright Gold
             transform: `rotate(${t.angle}deg)`,
             opacity: t.opacity,
-            boxShadow: '0 0 2px rgba(255, 215, 0, 0.8)', // Glow
+            boxShadow: '0 0 2px rgba(255,215,0,0.8)', // Glow
           }
         }
       }))
@@ -258,7 +258,7 @@ const RenderContentArea = ({ children }: any) => {
         position: 'relative',
         justifyContent: 'center',
         alignItems: 'center',
-        boxShadow: 'inset 0 0 20px rgba(180, 83, 9, 0.2)', // Warm shadow
+        boxShadow: 'inset 0 0 20px rgba(180,83,9,0.2)', // Warm shadow
         border: `2px solid ${MATERIALS.gold}`,
       },
       children: [
@@ -273,8 +273,8 @@ const RenderContentArea = ({ children }: any) => {
               width: '100%',
               height: '100%',
               backgroundImage: `
-                radial-gradient(circle, rgba(251, 191, 36, 0.05) 1px, transparent 1px),
-                radial-gradient(circle, rgba(251, 191, 36, 0.05) 1px, transparent 1px)
+                radial-gradient(circle, rgba(251,191,36,0.05) 1px, transparent 1px),
+                radial-gradient(circle, rgba(251,191,36,0.05) 1px, transparent 1px)
               `,
               backgroundSize: '20px 20px',
               backgroundPosition: '0 0, 10px 10px',
@@ -291,7 +291,7 @@ const RenderContentArea = ({ children }: any) => {
 
 // --- Main Component ---
 export const GoldenWood = ({ children }: MountingProps) => {
-  const goldenGrain = `linear-gradient(105deg, #b45309, #d97706 25%, #b45309 50%, #92400e 75%, #b45309), linear-gradient(to bottom, rgba(255, 215, 0, 0.1), transparent)`;
+  const goldenGrain = `linear-gradient(105deg, #b45309, #d97706 25%, #b45309 50%, #92400e 75%, #b45309), linear-gradient(to bottom, rgba(255,215,0,0.1), transparent)`;
 
   return {
     type: 'div',

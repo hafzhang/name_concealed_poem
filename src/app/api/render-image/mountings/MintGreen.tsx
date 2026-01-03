@@ -492,7 +492,7 @@ export const MintGreen = ({ children }: MountingProps) => {
     width: '100%',
     height: '100%',
     backgroundImage: bambooTexture,
-    boxShadow: '0 10px 30px rgba(34, 197, 94, 0.2)',
+    boxShadow: '0 10px 30px rgba(34,197,94,0.2)',
     zIndex: 1,
     display: 'flex',
   };

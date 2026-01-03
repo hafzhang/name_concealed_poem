@@ -29,8 +29,8 @@ const THEME_CONFIG = {
     secondary: '#c084fc',
     tertiary: '#e879f9',
     background: '#faf5ff',
-    mist: 'rgba(255, 255, 255, 0.4)',
-    shadow: 'rgba(147, 51, 234, 0.1)',
+    mist: 'rgba(255,255,255,0.4)',
+    shadow: 'rgba(147,51,234,0.1)',
   },
   dimensions: {
     borderWidth: 20,
@@ -73,8 +73,8 @@ export const LavenderMist = ({ children }: MountingProps) => {
   // 1. Base Layer: The "Canvas"
   // Using a complex gradient mesh to simulate watercolor paper texture and light leaks
   const backgroundGradient = `
-    radial-gradient(circle at 10% 10%, rgba(233, 213, 255, 0.8) 0%, transparent 40%),
-    radial-gradient(circle at 90% 90%, rgba(192, 132, 252, 0.6) 0%, transparent 40%),
+    radial-gradient(circle at 10% 10%, rgba(233,213,255,0.8) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(192,132,252,0.6) 0%, transparent 40%),
     radial-gradient(circle at 50% 50%, rgba(250, 245, 255, 1) 0%, rgba(243, 232, 255, 1) 100%)
   `;
 
@@ -126,7 +126,7 @@ export const LavenderMist = ({ children }: MountingProps) => {
               left: '-10%',
               width: '50%',
               height: '50%',
-              background: 'radial-gradient(circle, rgba(167, 139, 250, 0.2) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(167,139,250,0.2) 0%, transparent 70%)',
               filter: 'blur(40px)',
               zIndex: 2,
             }
@@ -142,7 +142,7 @@ export const LavenderMist = ({ children }: MountingProps) => {
               right: '-10%',
               width: '60%',
               height: '60%',
-              background: 'radial-gradient(circle, rgba(244, 114, 182, 0.15) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(244,114,182,0.15) 0%, transparent 70%)',
               filter: 'blur(50px)',
               zIndex: 2,
             }
@@ -157,13 +157,13 @@ export const LavenderMist = ({ children }: MountingProps) => {
               display: 'flex',
               flex: 1,
               position: 'relative',
-              background: 'rgba(255, 255, 255, 0.65)', // Milky glass effect
+              background: 'rgba(255,255,255,0.65)', // Milky glass effect
               borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.8)',
+              border: '1px solid rgba(255,255,255,0.8)',
               boxShadow: `
-                0 4px 6px -1px rgba(0, 0, 0, 0.05),
-                0 2px 4px -1px rgba(0, 0, 0, 0.03),
-                inset 0 0 20px rgba(255, 255, 255, 0.8)
+                0 4px 6px -1px rgba(0,0,0,0.05),
+                0 2px 4px -1px rgba(0,0,0,0.03),
+                inset 0 0 20px rgba(255,255,255,0.8)
               `,
               zIndex: 10, // Bring content above background effects
               padding: '40px', // Inner matting
@@ -181,7 +181,7 @@ export const LavenderMist = ({ children }: MountingProps) => {
                     left: '10px',
                     right: '10px',
                     bottom: '10px',
-                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                    border: '1px solid rgba(139,92,246,0.2)',
                     borderRadius: '8px',
                     pointerEvents: 'none',
                   }
@@ -199,8 +199,8 @@ export const LavenderMist = ({ children }: MountingProps) => {
                     left: '15px',
                     width: '30px',
                     height: '30px',
-                    borderTop: '2px solid rgba(167, 139, 250, 0.5)',
-                    borderLeft: '2px solid rgba(167, 139, 250, 0.5)',
+                    borderTop: '2px solid rgba(167,139,250,0.5)',
+                    borderLeft: '2px solid rgba(167,139,250,0.5)',
                     borderTopLeftRadius: '8px',
                   }
                 }
@@ -215,8 +215,8 @@ export const LavenderMist = ({ children }: MountingProps) => {
                     right: '15px',
                     width: '30px',
                     height: '30px',
-                    borderBottom: '2px solid rgba(167, 139, 250, 0.5)',
-                    borderRight: '2px solid rgba(167, 139, 250, 0.5)',
+                    borderBottom: '2px solid rgba(167,139,250,0.5)',
+                    borderRight: '2px solid rgba(167,139,250,0.5)',
                     borderBottomRightRadius: '8px',
                   }
                 }
@@ -907,7 +907,7 @@ const IMPRESSIONIST_COLOR_THEORY_NOTES = [
     description: "Shadows are not black but are composed of the complementary color of the object casting them and the color of the light.",
     application: "Shadows in this component are tinted purple or blue, never pure gray.",
     historicalExample: "Monet's snow scenes where shadows are violet.",
-    codeImplementation: "box-shadow: rgba(147, 51, 234, 0.2) instead of rgba(0,0,0,0.2)."
+    codeImplementation: "box-shadow: rgba(147,51,234,0.2) instead of rgba(0,0,0,0.2)."
   },
   {
     concept: "Wet-on-Wet",

@@ -103,7 +103,7 @@ const COLORS = {
   woodBase: '#451a03', // Deep Rosewood
   woodHighlight: '#78350f', // Lighter grain
   woodShadow: '#280f01', // Deep crevices
-  varnish: 'rgba(255, 200, 150, 0.1)', // Shiny top coat
+  varnish: 'rgba(255,200,150,0.1)', // Shiny top coat
   goldInlay: '#d4af37', // Gold leaf
   mattingBg: '#fef3c7', // Cream silk matting
   mattingTexture: '#e7e5e4',

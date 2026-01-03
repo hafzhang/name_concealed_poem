@@ -409,9 +409,9 @@ const LIGHTING_SIMULATION_CONFIG = {
 };
 
 // Helper for modern card shadow
-const modernShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+const modernShadow = '0 4px 20px rgba(0,0,0,0.1)';
 const glassEffect = {
-  background: 'rgba(255, 255, 255, 0.7)',
+  background: 'rgba(255,255,255,0.7)',
   backdropFilter: 'blur(10px)', // Note: Satori support limited, fallback to alpha
 };
 
@@ -449,7 +449,7 @@ export const ModernBlack = ({ children }: MountingProps) => {
     display: 'flex',
     alignItems: 'center',
     padding: '0 30px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
   };
 
   const headerDot: any = {

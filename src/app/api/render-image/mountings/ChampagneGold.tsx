@@ -181,9 +181,9 @@ export const ChampagneGold = ({ children }: MountingProps) => {
             style: {
               width: '90%',
               height: '90%',
-              backgroundColor: 'rgba(255, 255, 255, 0.92)',
+              backgroundColor: 'rgba(255,255,255,0.92)',
               borderRadius: '8px',
-              border: '1px solid rgba(253, 230, 138, 0.5)',
+              border: '1px solid rgba(253,230,138,0.5)',
               display: 'flex',
               flexDirection: 'column',
               position: 'relative',
@@ -209,7 +209,7 @@ export const ChampagneGold = ({ children }: MountingProps) => {
                             `,
                             backgroundSize: '20px 20px',
                             backgroundPosition: '0 0, 10px 10px',
-                            boxShadow: 'inset 0 0 40px rgba(217, 119, 6, 0.05)',
+                            boxShadow: 'inset 0 0 40px rgba(217,119,6,0.05)',
                         },
                         children: [
                              // Header Ornament
@@ -222,7 +222,7 @@ export const ChampagneGold = ({ children }: MountingProps) => {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        borderBottom: '1px solid rgba(217, 119, 6, 0.2)',
+                                        borderBottom: '1px solid rgba(217,119,6,0.2)',
                                         background: 'linear-gradient(to bottom, #fff7ed, #ffedd5)',
                                     },
                                     children: [
@@ -265,7 +265,7 @@ export const ChampagneGold = ({ children }: MountingProps) => {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        borderTop: '1px solid rgba(217, 119, 6, 0.2)',
+                                        borderTop: '1px solid rgba(217,119,6,0.2)',
                                         background: 'linear-gradient(to top, #fff7ed, #ffedd5)',
                                     },
                                     children: [

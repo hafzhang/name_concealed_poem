@@ -27,7 +27,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "beautifier:start": "node ./.trae/extensions/editor-helper.js beautifier",
+    "pipeline:start": "node ./.trae/extensions/editor-helper.js pipeline",
+    "longrunner:start": "node ./.trae/extensions/editor-helper.js start",
+    "ai:once": "node ./.trae/extensions/editor-helper.js ai"
   },
   "dependencies": {
     "@fontpkg/kouzan-brush-font": "^1.1.0",
