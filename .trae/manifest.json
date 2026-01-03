@@ -3,8 +3,8 @@
   "displayName": "Beautifier Extension",
   "description": "Auto-beautify mounting styles and run long pipelines",
   "version": "0.0.1",
-  "activationEvents": ["onStartup"],
-  "main": "./extensions/editor-helper.ts",
+  "activationEvents": ["onStartup", "onCommand:trae.beautifier.start", "onCommand:trae.pipeline.start"],
+  "main": "./extensions/editor-helper.js",
   "contributes": {
     "commands": [
       {
