@@ -218,11 +218,10 @@ const RenderCarvedCorner = ({ type, position }: any) => {
                 // but here we rely on the stroke color contrast.
               }
             })).concat(
-              // Add Highlight layer for 3D effect
-               paths.map((d: string, i: number) => ({
+              paths.map((d: string, i: number) => ({
                 type: 'path',
                 props: {
-                  key: `highlight-${i}`,
+                  key: i + 100000,
                   d: d,
                   stroke: 'rgba(255,255,255,0.1)',
                   strokeWidth: '0.5',

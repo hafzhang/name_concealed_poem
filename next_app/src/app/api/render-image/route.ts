@@ -82,7 +82,7 @@ const loadFont = (style: string) => {
              const fallbackPath = join(cwd, 'node_modules', '@fontsource/noto-serif-sc', 'files', 'noto-serif-sc-chinese-simplified-400-normal.woff');
              return { name: 'NotoSerifSC', data: readFileSync(fallbackPath) };
         } catch (e3) {
-             throw new Error(`Font file not found: ${e.message}, ${e2}, ${e3}`);
+             throw new Error(`Font file not found: ${String(e)}, ${String(e2)}, ${String(e3)}`);
         }
     }
   }
@@ -97,6 +97,7 @@ import { SakuraPink } from './mountings/SakuraPink';
 import { MintGreen } from './mountings/MintGreen';
 import { LavenderMist } from './mountings/LavenderMist';
 import { ChampagneGold } from './mountings/ChampagneGold';
+import { AzurePorcelain } from './mountings/AzurePorcelain';
 
 export async function POST(req: Request) {
   try {
@@ -151,6 +152,8 @@ export async function POST(req: Request) {
            return LavenderMist({ children });
         case 'champagne_gold': // 流金岁月
             return ChampagneGold({ children });
+        case 'azure_porcelain': // 青瓷纹饰
+            return AzurePorcelain({ children });
         
         default: // 'none' and fallback
            return {
@@ -274,7 +277,7 @@ export async function POST(req: Request) {
 
     // Satori rendering
     const svg = await satori(
-      renderFrame(frame, poemElements),
+      renderFrame(frame, poemElements) as any,
       {
         width: 800,
         height: 1200,

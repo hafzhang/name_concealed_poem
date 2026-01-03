@@ -12,13 +12,14 @@ async function testRender() {
     { name: 'Redwood', id: 'redwood' },
     { name: 'GoldenWood', id: 'golden_wood' },
     { name: 'LavenderMist', id: 'lavender_mist' },
-    { name: 'SilkScroll', id: 'silk_scroll' }
+    { name: 'SilkScroll', id: 'silk_scroll' },
+    { name: 'AzurePorcelain', id: 'azure_porcelain' }
   ];
 
   for (const style of styles) {
     console.log(`Testing ${style.name} (${style.id})...`);
     try {
-        const response = await fetch(`http://127.0.0.1:3000/api/render-image`, {
+        const response = await fetch(`http://127.0.0.1:3001/api/render-image`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
