@@ -43,7 +43,6 @@
     "@fontsource/zen-old-mincho": "^5.2.8",
     "@fontsource/zhi-mang-xing": "^5.2.8",
     "@resvg/resvg-js": "^2.6.2",
-    "@resvg/resvg-js-win32-x64-msvc": "^2.6.2",
     "@supabase/supabase-js": "^2.89.0",
     "autoprefixer": "^10.4.23",
     "class-variance-authority": "^0.7.1",
