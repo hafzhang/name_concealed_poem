@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.AI_API_KEY,
-  baseURL: process.env.AI_BASE_URL,
-});
+const getOpenAI = () => {
+  return new OpenAI({
+    apiKey: process.env.AI_API_KEY || '',
+    baseURL: process.env.AI_BASE_URL || undefined,
+  });
+};
 
 // Map font styles to literary styles for better poem generation
 const styleMap: Record<string, string> = {
@@ -46,8 +47,8 @@ export async function POST(req: Request) {
       "explanation": "对这首诗的简短意境赏析"
     }`;
 
-    // Call AI API
-    const completion = await openai.chat.completions.create({
+    const client = getOpenAI();
+    const completion = await client.chat.completions.create({
       model: process.env.AI_MODEL_NAME || 'glm-4',
       messages: [
         { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
