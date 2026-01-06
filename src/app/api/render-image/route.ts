@@ -225,7 +225,7 @@ export async function POST(req: Request) {
                   style: {
                     display: 'flex',
                     flexDirection: 'column',
-                    fontSize: '24px',
+                    fontSize: '32px', // Increased from 24px
                     color: '#57534e',
                     fontFamily: fontInfo.name, // Use same font for consistency
                     opacity: 0.8,
@@ -235,7 +235,7 @@ export async function POST(req: Request) {
                     key: `year-${i}`,
                     props: {
                       children: char,
-                      style: { marginBottom: '5px' }
+                      style: { marginBottom: '8px' } // Increased spacing
                     }
                   }))
                 }
@@ -245,18 +245,18 @@ export async function POST(req: Request) {
                 type: 'div',
                 props: {
                   style: {
-                    width: '60px',
-                    height: '60px',
+                    width: '80px', // Increased from 60px
+                    height: '80px', // Increased from 60px
                     backgroundColor: '#b91c1c', // Red background
                     color: 'white',
                     display: 'flex',
                     flexDirection: isSealTwoChars ? 'column' : 'row', // Vertical for 2 chars
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: isSealTwoChars ? '22px' : '32px', // Smaller font for 2 chars
-                    borderRadius: '8px', // Slightly rounded
+                    fontSize: isSealTwoChars ? '36px' : '48px', // Increased from 22px/32px
+                    borderRadius: '12px', // Slightly rounded
                     fontFamily: fontInfo.name,
-                    border: '2px solid #991b1b',
+                    border: '3px solid #991b1b', // Thicker border
                     boxShadow: 'inset 0 0 10px rgba(0,0,0,0.2)',
                     gap: isSealTwoChars ? '0px' : '0',
                   },

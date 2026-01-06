@@ -5,6 +5,7 @@ const getOpenAI = () => {
   return new OpenAI({
     apiKey: process.env.AI_API_KEY || '',
     baseURL: process.env.AI_BASE_URL || undefined,
+    timeout: parseInt(process.env.AI_TIMEOUT || '60000', 10), // 默认 60 秒
   });
 };
 
@@ -35,17 +36,18 @@ export async function POST(req: Request) {
     // Construct the prompt
     const prompt = `你是一个国学大师。请为"${name}"创作一首五言绝句藏头诗。
     
-    要求：
-    1. 必须是藏头诗，每句的第一个字依次是"${name}"中的字。如果名字只有两个字，则前两句藏头；如果三个字，前三句藏头。
-    2. 风格要求：${literaryStyle}。
-    3. 必须严格按照以下JSON格式返回，不要包含Markdown代码块或其他多余字符。
-    4.诗句的前后语义要顺畅，搭配流畅，不能生硬转折。
-    
-    JSON格式模板：
-    {
+要求：
+1. 必须是藏头诗，每句的第一个字依次是"${name}"中的字。如果名字只有两个字，则前两句藏头；如果三个字，前三句藏头。
+2. 意境：${literaryStyle}，要求意境优美、寓意深远、格调高雅
+3. 内容：整体积极向上，含赞美、祝福或美好期许之意
+4. 语义：诗句之间衔接自然，前后贯通，避免生硬拼凑
+
+【返回格式】
+仅返回纯JSON对象，不要添加任何解释性文字：
+{
       "poem": ["第一句", "第二句", "第三句", "第四句"],
       "explanation": "对这首诗的简短意境赏析"
-    }`;
+}`;
 
     const client = getOpenAI();
     const completion = await client.chat.completions.create({
