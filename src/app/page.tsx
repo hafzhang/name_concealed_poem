@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useGuestId } from '@/lib/hooks/useGuestId';
+import { usePoemGenerator } from '@/hooks/usePoemGenerator';
 import { Loader2, Send, Download, RefreshCw, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,30 +11,49 @@ type Step = 'input' | 'generating_poem' | 'review' | 'generating_image' | 'resul
 interface PoemData {
   poem: string[];
   explanation: string;
+  originalName?: string;
+  processedName?: string;
+  lineCount?: number;
 }
 
 export default function Home() {
   const guestId = useGuestId();
   const [step, setStep] = useState<Step>('input');
   const [name, setName] = useState('');
-  const [styleKeyword, setStyleKeyword] = useState('');
   const [style, setStyle] = useState('kaishu');
   const [frame, setFrame] = useState('none');
   const [poemData, setPoemData] = useState<PoemData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  // 使用 Hook 管理风格选择、行数选择、分类展开状态
+  const {
+    lineCount,
+    styleKeyword,
+    expandedCategories,
+    STYLE_CATEGORIES,
+    setLineCount,
+    setStyleKeyword,
+    toggleCategory,
+    generateRequestParams
+  } = usePoemGenerator();
+
   const handleGeneratePoem = async () => {
     if (!name || name.length < 2) return;
     setStep('generating_poem');
-    
+
+    // 使用 Hook 生成请求参数（包含名字处理逻辑）
+    const params = generateRequestParams(name, style);
+
+    console.log(`生成藏头诗 - 原始名字: ${name}, 处理后名字: ${params.name}, 行数: ${params.lineCount}`);
+
     try {
       const res = await fetch('/api/generate-poem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, style, styleKeyword })
+        body: JSON.stringify(params)
       });
       const data = await res.json();
-      
+
       if (data.success) {
         setPoemData(data.data);
         setStep('review');
@@ -105,40 +125,93 @@ export default function Home() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-stone-700 mb-2">风格关键词 (可选)</label>
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2">
-                  {['清新婉约', '豪放旷达', '空灵禅意', '边塞苍凉', '田园闲适'].map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setStyleKeyword(s);
-                      }}
-                      className={cn(
-                        "px-3 py-1.5 rounded-full text-xs border transition-colors cursor-pointer relative z-10 select-none",
-                        styleKeyword === s
-                          ? "bg-stone-800 text-white border-stone-800"
-                          : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
-                      )}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={styleKeyword}
-                  onChange={(e) => setStyleKeyword(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-500 outline-none transition mt-2"
-                  placeholder="或输入自定义风格..."
-                  maxLength={10}
-                />
+            {/* 几行诗选择 */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
+                <h3 className="font-medium text-stone-800">几行诗</h3>
               </div>
+              <div className="flex gap-3">
+                {[2, 4, 6].map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setLineCount(num)}
+                    className={cn(
+                      "px-4 py-2 rounded-lg border text-sm transition-all flex-1",
+                      lineCount === num
+                        ? "bg-stone-800 text-white border-stone-800"
+                        : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
+                    )}
+                  >
+                    {num}行
+                  </button>
+                ))}
+              </div>
+              {lineCount === 2 && name.length >= 3 && (
+                <p className="text-xs text-stone-500">提示：2行诗将使用名字的后两个字</p>
+              )}
             </div>
-            
+
+            {/* 风格选择 - 分类展示 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
+                <h3 className="font-medium text-stone-800">风格</h3>
+              </div>
+
+              {/* 按分类渲染风格选项 */}
+              {Object.entries(STYLE_CATEGORIES).map(([category, styles]) => (
+                <div key={category} className="space-y-2">
+                  {/* 分类标题（可点击展开/收起） */}
+                  <button
+                    type="button"
+                    onClick={() => toggleCategory(category)}
+                    className="flex items-center justify-between w-full text-left px-2 py-1 hover:bg-stone-50 rounded"
+                  >
+                    <span className="text-sm font-medium text-stone-700">{category}</span>
+                    <span className={cn(
+                      "text-stone-400 transition-transform text-xs",
+                      expandedCategories[category] ? "rotate-180" : ""
+                    )}>
+                      ▼
+                    </span>
+                  </button>
+
+                  {/* 风格按钮网格 */}
+                  {expandedCategories[category] !== false && (
+                    <div className="grid grid-cols-4 gap-2">
+                      {styles.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setStyleKeyword(s)}
+                          className={cn(
+                            "px-3 py-2 rounded-lg text-sm border transition-colors cursor-pointer select-none",
+                            styleKeyword === s
+                              ? "bg-stone-800 text-white border-stone-800"
+                              : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
+                          )}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* 自由输入框 */}
+              <input
+                type="text"
+                value={styleKeyword}
+                onChange={(e) => setStyleKeyword(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-500 outline-none transition"
+                placeholder={styleKeyword ? "" : "或输入自定义风格..."}
+                maxLength={10}
+              />
+            </div>
+
             <button
               onClick={handleGeneratePoem}
               disabled={!name || name.length < 2}

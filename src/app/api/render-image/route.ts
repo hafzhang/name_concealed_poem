@@ -101,9 +101,9 @@ import { AzurePorcelain } from './mountings/AzurePorcelain';
 
 export async function POST(req: Request) {
   try {
-    const { poem, style, bg, frame, name } = await req.json();
+    const { poem, style, bg, frame, name, lineCount = 4 } = await req.json();
 
-    if (!poem || !Array.isArray(poem) || poem.length !== 4) {
+    if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
       return NextResponse.json(
         { success: false, error: 'Invalid poem data' },
         { status: 400 }
@@ -111,10 +111,37 @@ export async function POST(req: Request) {
     }
 
     const fontInfo = loadFont(style);
-    
+
     // Prepare seal text
     const sealText = name ? (name.length > 2 ? name.slice(-2) : name) : '印';
     const isSealTwoChars = sealText.length > 1;
+
+    // 根据诗句数量动态调整布局
+    const poemLength = poem.length;
+
+    // 动态计算字体大小（诗句越多，字体越小）
+    const getFontSize = (lineCount: number) => {
+      switch (lineCount) {
+        case 2: return 72;  // 2行诗用较大字体
+        case 4: return 64;  // 4行诗用默认字体
+        case 6: return 52;  // 6行诗用较小字体
+        default: return 64;
+      }
+    };
+
+    const fontSize = getFontSize(poemLength);
+
+    // 动态计算垂直间距
+    const getGapSize = (lineCount: number) => {
+      switch (lineCount) {
+        case 2: return '80px';  // 2行诗间距较大
+        case 4: return '50px';  // 4行诗默认间距
+        case 6: return '35px';  // 6行诗间距较小
+        default: return '50px';
+      }
+    };
+
+    const gapSize = getGapSize(poemLength);
 
     // Load fallback font (NotoSerifSC) to prevent blank text if main font fails or misses glyphs
     let fallbackFontInfo = null;
@@ -174,7 +201,7 @@ export async function POST(req: Request) {
             style: {
               display: 'flex',
               flexDirection: 'row-reverse', // Right to left
-              gap: '50px',
+              gap: gapSize,  // 使用动态计算的间距
               width: '100%',
               height: '100%',
               justifyContent: 'center',
@@ -187,7 +214,7 @@ export async function POST(req: Request) {
                 style: {
                   display: 'flex',
                   flexDirection: 'column', // Top to bottom
-                  fontSize: '64px',
+                  fontSize: `${fontSize}px`,  // 使用动态计算的字体大小
                   lineHeight: '1.2',
                   color: '#1c1917',
                   fontFamily: fallbackFontInfo ? `${fontInfo.name}, ${fallbackFontInfo.name}` : fontInfo.name,

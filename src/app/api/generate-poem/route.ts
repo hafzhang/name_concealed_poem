@@ -21,11 +21,17 @@ const styleMap: Record<string, string> = {
 
 export async function POST(req: Request) {
   try {
-    const { name, style, styleKeyword } = await req.json();
+    // 接收参数：name 是前端已处理过的名字，与 lineCount 匹配
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = await req.json();
 
-    if (!name || name.length < 2 || name.length > 4) {
+    // 注意：name 是前端已经处理过的名字
+    // - lineCount=2 时，name 长度一定是 2
+    // - lineCount=4 时，name 长度可能是 2-4
+    // - lineCount=6 时，name 长度可能是 2-4
+
+    if (!name || name.length < 2) {
       return NextResponse.json(
-        { success: false, error: 'Name must be between 2 and 4 characters' },
+        { success: false, error: '名字至少需要2个字符' },
         { status: 400 }
       );
     }
@@ -33,11 +39,29 @@ export async function POST(req: Request) {
     // Determine literary style
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
 
-    // Construct the prompt
-    const prompt = `你是一个国学大师。请为"${name}"创作一首五言绝句藏头诗。
-    
+    // 根据行数动态构建 Prompt
+    let formatInstruction = "五言绝句";
+    let acrosticInstruction = "必须是藏头诗，共四句。每句的第一个字依次是";
+    let poemCount = 4;
+
+    if (lineCount === 2) {
+      formatInstruction = "五言对联";
+      acrosticInstruction = "必须是藏头对联，共两句。每句的第一个字依次是";
+      poemCount = 2;
+    } else if (lineCount === 6) {
+      formatInstruction = "六句五言诗";
+      acrosticInstruction = "前三句必须是藏头，第1-3句的第一个字依次是";
+      poemCount = 6;
+    }
+    // lineCount === 4 时使用默认值
+
+    // 构建诗句数组模板
+    const poemTemplate = Array.from({ length: poemCount }, (_, i) => `第${i + 1}句`);
+
+    const prompt = `你是一个国学大师。请为"${name}"创作一首${formatInstruction}。
+
 要求：
-1. 必须是藏头诗，每句的第一个字依次是"${name}"中的字。如果名字只有两个字，则前两句藏头；如果三个字，前三句藏头。
+1. ${acrosticInstruction}"${name}"中的字。${lineCount === 6 ? '第4-6句自由发挥，不重复姓名，但需与前文意境连贯。' : ''}
 2. 意境：${literaryStyle}，要求意境优美、寓意深远、格调高雅
 3. 内容：整体积极向上，含赞美、祝福或美好期许之意
 4. 语义：诗句之间衔接自然，前后贯通，避免生硬拼凑
@@ -45,13 +69,15 @@ export async function POST(req: Request) {
 【返回格式】
 仅返回纯JSON对象，不要添加任何解释性文字：
 {
-      "poem": ["第一句", "第二句", "第三句", "第四句"],
-      "explanation": "对这首诗的简短意境赏析"
+    "poem": [${poemTemplate.map(s => `"${s}"`).join(', ')}],
+    "explanation": "对这首诗的简短意境赏析"
 }`;
+
+    console.log(`生成藏头诗 - 名字: ${name}, 原始名字: ${originalName || name}, 行数: ${lineCount}, 格式: ${formatInstruction}`);
 
     const client = getOpenAI();
     const completion = await client.chat.completions.create({
-      model: process.env.AI_MODEL_NAME || 'glm-4',
+      model: process.env.AI_MODEL_NAME || 'gpt-4',
       messages: [
         { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
         { role: 'user', content: prompt }
@@ -81,7 +107,7 @@ export async function POST(req: Request) {
       result = JSON.parse(jsonStr);
     } catch (e) {
       console.error('JSON Parse Error:', e);
-      // Fallback if JSON parsing fails (extremely rare with GLM-4 and proper prompt)
+      // Fallback if JSON parsing fails
       return NextResponse.json(
         { success: false, error: 'Failed to parse AI response' },
         { status: 500 }
@@ -93,6 +119,9 @@ export async function POST(req: Request) {
       data: {
         poem: result.poem,
         explanation: result.explanation,
+        originalName: originalName || name,  // 返回原始名字用于显示
+        processedName: name,                 // 返回处理后的名字
+        lineCount,
         cached: false
       }
     });

@@ -60,7 +60,7 @@ const CloudBorder = ({ side }: { side: 'top' | 'bottom' | 'left' | 'right' }) =>
           viewBox: '0 0 80 50',
           style: {
             opacity: 0.25,
-            transform: isHorizontal ? 'none' : `rotate(${side === 'left' ? 90 : -90}deg)`,
+            transform: isHorizontal ? 'rotate(0deg)' : `rotate(${side === 'left' ? 90 : -90}deg)`,
           },
           children: [{
             type: 'path',
