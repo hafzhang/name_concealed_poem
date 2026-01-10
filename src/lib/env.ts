@@ -14,29 +14,10 @@ const envSchema = z.object({
   // Node 环境
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
-  // AI API 配置
+  // AI API 配置（必需）
   AI_API_KEY: z.string().min(1, 'AI_API_KEY 不能为空'),
-  AI_BASE_URL: z.string().url('AI_BASE_URL 必须是有效的 URL').optional(),
-  AI_MODEL_NAME: z.string().min(1).default('gpt-4'),
-  AI_TIMEOUT: z.string().optional().transform((val) => parseInt(val || '60000', 10)).pipe(
-    z.number().min(1000).max(300000)
-  ).default(60000),
-
-  // 应用配置
-  APP_URL: z.string().url().optional().default('http://localhost:3000'),
-
-  // 缓存配置
-  CACHE_MAX_SIZE: z.string().optional().transform((val) => parseInt(val || '10', 10)).pipe(
-    z.number().min(1).max(100)
-  ).default(10),
-
-  CACHE_IMAGE_EXPIRY: z.string().optional().transform((val) => parseInt(val || '24', 10)).pipe(
-    z.number().min(1).max(168) // 最大一周
-  ).default(24),
-
-  CACHE_FONT_EXPIRY: z.string().optional().transform((val) => parseInt(val || '168', 10)).pipe(
-    z.number().min(1).max(720) // 最大30天
-  ).default(168),
+  AI_BASE_URL: z.string().url().optional(),
+  AI_MODEL_NAME: z.string().default('gpt-4'),
 });
 
 /**
@@ -92,7 +73,7 @@ export function getAIConfig() {
     apiKey: env.AI_API_KEY,
     baseURL: env.AI_BASE_URL,
     modelName: env.AI_MODEL_NAME,
-    timeout: env.AI_TIMEOUT,
+    timeout: 60000, // 默认 60 秒
   };
 }
 
@@ -101,9 +82,9 @@ export function getAIConfig() {
  */
 export function getCacheConfig() {
   return {
-    maxSize: env.CACHE_MAX_SIZE,
-    imageExpiry: env.CACHE_IMAGE_EXPIRY,
-    fontExpiry: env.CACHE_FONT_EXPIRY,
+    maxSize: 10, // MB
+    imageExpiry: 24, // 小时
+    fontExpiry: 168, // 小时 (7天)
   };
 }
 
@@ -112,7 +93,6 @@ export function getCacheConfig() {
  */
 export function getAppConfig() {
   return {
-    url: env.APP_URL,
     env: env.NODE_ENV,
     isDevelopment,
     isProduction,
