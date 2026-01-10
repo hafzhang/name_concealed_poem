@@ -8,7 +8,7 @@ import { readFileSync } from 'fs';
 const loadFont = (style: string) => {
   const cwd = process.cwd();
   let fontPackage = '@fontsource/noto-serif-sc';
-  let fontFile = 'noto-serif-sc-chinese-simplified-400-normal.woff';
+  let fontFile = 'noto-serif-sc-100-400-normal.woff';
   let fontName = 'NotoSerifSC';
 
   // Map styles to fonts
@@ -20,12 +20,12 @@ const loadFont = (style: string) => {
       break;
     case 'xingshu':
       fontPackage = '@fontsource/zhi-mang-xing';
-      fontFile = 'zhi-mang-xing-chinese-simplified-400-normal.woff';
+      fontFile = 'zhi-mang-xing-100-400-normal.woff';
       fontName = 'ZhiMangXing';
       break;
     case 'caoshu':
       fontPackage = '@fontsource/liu-jian-mao-cao';
-      fontFile = 'liu-jian-mao-cao-chinese-simplified-400-normal.woff';
+      fontFile = 'liu-jian-mao-cao-100-400-normal.woff';
       fontName = 'LiuJianMaoCao';
       break;
     case 'lishu':
@@ -40,7 +40,7 @@ const loadFont = (style: string) => {
       break;
     case 'niaochong':
       fontPackage = '@fontsource/zcool-xiaowei';
-      fontFile = 'zcool-xiaowei-chinese-simplified-400-normal.woff';
+      fontFile = 'zcool-xiaowei-100-400-normal.woff';
       fontName = 'ZcoolXiaoWei';
       break;
     case 'mianhua':
@@ -50,7 +50,7 @@ const loadFont = (style: string) => {
       break;
     case 'marker':
       fontPackage = '@fontsource/lxgw-marker-gothic';
-      fontFile = 'lxgw-marker-gothic-chinese-traditional-400-normal.woff'; // It has traditional, maybe not simplified?
+      fontFile = 'lxgw-marker-gothic-0-400-normal.woff';
       fontName = 'LXGWMarkerGothic';
       break;
     default:
@@ -59,12 +59,12 @@ const loadFont = (style: string) => {
   }
 
   // Try node_modules path
-  const fontPath = fontPackage === 'local' 
+  const fontPath = fontPackage === 'local'
     ? join(cwd, 'public', 'fonts', fontFile)
     : join(cwd, 'node_modules', fontPackage, 'files', fontFile);
-  
+
   console.log(`Loading font ${fontName} from:`, fontPath);
-    
+
     try {
       const fontData = readFileSync(fontPath);
       console.log(`Font ${fontName} loaded, size: ${fontData.byteLength} bytes`);
@@ -72,18 +72,13 @@ const loadFont = (style: string) => {
     } catch (e) {
       // Fallback to searching in local public folder if node_modules fails
       console.error(`Failed to load font from ${fontPath}`, e);
-    // Fallback to NotoSerifSC if specific font fails
+    // Fallback to LXGWWenKai.ttf if specific font fails
     try {
-        // Try public/fonts/NotoSerifSC.otf first as it is more likely to be there in this env
-        const localFallback = join(cwd, 'public', 'fonts', 'NotoSerifSC.otf');
-        return { name: 'NotoSerifSC', data: readFileSync(localFallback) };
+        // Use LXGWWenKai.ttf as universal fallback (it exists in public/fonts/)
+        const fallbackPath = join(cwd, 'public', 'fonts', 'LXGWWenKai.ttf');
+        return { name: 'LXGWWenKai', data: readFileSync(fallbackPath) };
     } catch (e2) {
-        try {
-             const fallbackPath = join(cwd, 'node_modules', '@fontsource/noto-serif-sc', 'files', 'noto-serif-sc-chinese-simplified-400-normal.woff');
-             return { name: 'NotoSerifSC', data: readFileSync(fallbackPath) };
-        } catch (e3) {
-             throw new Error(`Font file not found: ${String(e)}, ${String(e2)}, ${String(e3)}`);
-        }
+        throw new Error(`Font file not found: ${String(e)}, ${String(e2)}`);
     }
   }
 };
@@ -143,9 +138,9 @@ export async function POST(req: Request) {
 
     const gapSize = getGapSize(poemLength);
 
-    // Load fallback font (NotoSerifSC) to prevent blank text if main font fails or misses glyphs
+    // Load fallback font to prevent blank text if main font fails or misses glyphs
     let fallbackFontInfo = null;
-    if (fontInfo.name !== 'NotoSerifSC') {
+    if (fontInfo.name !== 'NotoSerifSC' && fontInfo.name !== 'LXGWWenKai') {
         try {
             fallbackFontInfo = loadFont('default');
         } catch (e) {
