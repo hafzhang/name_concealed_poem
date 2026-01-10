@@ -58,29 +58,16 @@ const loadFont = (style: string) => {
       break;
   }
 
-  // Try node_modules path
+  // Load font from correct path
   const fontPath = fontPackage === 'local'
     ? join(cwd, 'public', 'fonts', fontFile)
     : join(cwd, 'node_modules', fontPackage, 'files', fontFile);
 
   console.log(`Loading font ${fontName} from:`, fontPath);
 
-    try {
-      const fontData = readFileSync(fontPath);
-      console.log(`Font ${fontName} loaded, size: ${fontData.byteLength} bytes`);
-      return { name: fontName, data: fontData };
-    } catch (e) {
-      // Fallback to searching in local public folder if node_modules fails
-      console.error(`Failed to load font from ${fontPath}`, e);
-    // Fallback to LXGWWenKai.ttf if specific font fails
-    try {
-        // Use LXGWWenKai.ttf as universal fallback (it exists in public/fonts/)
-        const fallbackPath = join(cwd, 'public', 'fonts', 'LXGWWenKai.ttf');
-        return { name: 'LXGWWenKai', data: readFileSync(fallbackPath) };
-    } catch (e2) {
-        throw new Error(`Font file not found: ${String(e)}, ${String(e2)}`);
-    }
-  }
+  const fontData = readFileSync(fontPath);
+  console.log(`Font ${fontName} loaded, size: ${fontData.byteLength} bytes`);
+  return { name: fontName, data: fontData };
 };
 
 import { SilkScroll } from './mountings/SilkScroll';
@@ -137,16 +124,6 @@ export async function POST(req: Request) {
     };
 
     const gapSize = getGapSize(poemLength);
-
-    // Load fallback font to prevent blank text if main font fails or misses glyphs
-    let fallbackFontInfo = null;
-    if (fontInfo.name !== 'NotoSerifSC' && fontInfo.name !== 'LXGWWenKai') {
-        try {
-            fallbackFontInfo = loadFont('default');
-        } catch (e) {
-            console.error('Failed to load fallback font', e);
-        }
-    }
 
     // Helper to render complex frames
     const renderFrame = (frameType: string, children: any[]) => {
@@ -212,7 +189,7 @@ export async function POST(req: Request) {
                   fontSize: `${fontSize}px`,  // 使用动态计算的字体大小
                   lineHeight: '1.2',
                   color: '#1c1917',
-                  fontFamily: fallbackFontInfo ? `${fontInfo.name}, ${fallbackFontInfo.name}` : fontInfo.name,
+                  fontFamily: fontInfo.name,
                 },
                 children: (line || '').split('').map((char, j) => ({
                   type: 'div',
@@ -310,12 +287,6 @@ export async function POST(req: Request) {
             weight: 400,
             style: 'normal',
           },
-          ...(fallbackFontInfo ? [{
-            name: fallbackFontInfo.name,
-            data: fallbackFontInfo.data,
-            weight: 400,
-            style: 'normal',
-          } as const] : []),
         ],
       }
     );
