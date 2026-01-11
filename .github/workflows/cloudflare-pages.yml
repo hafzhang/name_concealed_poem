@@ -32,6 +32,18 @@ jobs:
       - name: Build for Cloudflare Pages
         run: npx @cloudflare/next-on-pages
 
+      - name: List build output
+        run: |
+          echo "=== Build output directory structure ==="
+          ls -la .vercel/output/static/
+          echo "=== Checking for index.html ==="
+          if [ -f .vercel/output/static/index.html ]; then
+            echo "index.html exists!"
+            head -20 .vercel/output/static/index.html
+          else
+            echo "index.html NOT found!"
+          fi
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
