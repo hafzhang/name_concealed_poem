@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 
+export const runtime = 'edge';
+
 // Font configuration mapping
 interface FontConfig {
   url: string;
