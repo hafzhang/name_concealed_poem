@@ -1,0 +1,37 @@
+# 简单的测试工作流 - 只构建不部署
+name: Test Build
+
+on:
+  workflow_dispatch:  # 手动触发
+  push:
+    branches: [master]
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Build for Cloudflare Pages
+        run: npx @cloudflare/next-on-pages
+
+      - name: Verify output
+        run: |
+          echo "=== Checking .vercel/output structure ==="
+          ls -la .vercel/output/
+          echo "=== Checking static files ==="
+          ls -la .vercel/output/static/ || echo "No static directory"
+          echo "=== Checking for index.html ==="
+          cat .vercel/output/static/index.html | head -50 || echo "No index.html found"
