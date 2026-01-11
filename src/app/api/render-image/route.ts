@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import satori from 'satori';
-import { Resvg } from '@resvg/resvg-js';
 
 export const runtime = 'edge';
 
@@ -292,7 +291,7 @@ export async function POST(req: Request) {
       }
     ];
 
-    // Satori rendering
+    // Satori rendering - return SVG directly (no PNG conversion for Edge Runtime compatibility)
     const svg = await satori(
       renderFrame(frame, poemElements) as any,
       {
@@ -309,24 +308,14 @@ export async function POST(req: Request) {
       }
     );
 
-    // Resvg rendering
-    const resvg = new Resvg(svg, {
-      fitTo: {
-        mode: 'width',
-        value: 800,
-      },
-    });
-
-    const pngData = resvg.render();
-    const pngBuffer = pngData.asPng();
-
-    // For MVP, return base64 data URI directly to avoid Supabase storage setup complexity for now
-    const base64Image = `data:image/png;base64,${pngBuffer.toString('base64')}`;
+    // Return SVG as base64 data URI (works in Edge Runtime)
+    const base64Svg = btoa(unescape(encodeURIComponent(svg)));
+    const svgImage = `data:image/svg+xml;base64,${base64Svg}`;
 
     return NextResponse.json({
       success: true,
       data: {
-        imageUrl: base64Image,
+        imageUrl: svgImage,
         remainingCredits: 2
       }
     });
