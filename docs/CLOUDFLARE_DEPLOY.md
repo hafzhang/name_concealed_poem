@@ -28,7 +28,44 @@
 5. 点击 **"Connect to Git"**
 6. 选择你的 GitHub 仓库：`hafzhang/name_concealed_poem`
 
-### 3. 配置构建设置（重要！）
+### 3. 部署方式
+
+#### 推荐方式：使用 Wrangler CLI 部署
+
+这是最稳定的方式，完全支持 Next.js API 路由。
+
+**步骤**：
+
+1. **安装 Wrangler CLI**
+   ```bash
+   npm install -g wrangler
+   ```
+
+2. **登录 Cloudflare**
+   ```bash
+   wrangler login
+   ```
+
+3. **构建项目**
+   ```bash
+   npm install
+   npm run build
+   npx @cloudflare/next-on-pages
+   ```
+
+4. **部署到 Cloudflare Pages**
+   ```bash
+   npx wrangler pages deploy .vercel/output/static --project-name=name-concealed-poem
+   ```
+
+5. **配置环境变量**（首次部署后在 Dashboard 设置）
+   - 访问 Cloudflare Dashboard
+   - 进入项目 → Settings → Environment variables
+   - 添加：`AI_API_KEY = your-api-key-here`
+
+#### 备选方式：GitHub 自动部署
+
+**注意**：此方式可能不稳定，不推荐用于生产环境。
 
 在设置页面填写以下内容：
 
@@ -36,9 +73,10 @@
 |-------|-----|
 | **Project name** | `name-concealed-poem`（或自定义） |
 | **Production branch** | `master` |
-| **Framework preset** | `Next.js` |
-| **Build command** | `npx @cloudflare/next-on-pages` |
+| **Framework preset** | `None` |
+| **Build command** | `npm run build && npx @cloudflare/next-on-pages` |
 | **Build output directory** | `.vercel/output/static` |
+| **Root directory** | `/` |
 
 ### 4. 配置环境变量
 
