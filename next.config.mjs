@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@resvg/resvg-js'],
+  output: 'export',
+  images: {
+    unoptimized: true,
   },
 };
 
