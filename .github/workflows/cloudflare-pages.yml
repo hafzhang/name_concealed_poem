@@ -27,20 +27,10 @@ jobs:
         run: npm ci
 
       - name: Build with @opennextjs/cloudflare
-        run: npx @opennextjs/cloudflare
-
-      - name: List build output
-        run: |
-          echo "=== Build output directory structure ==="
-          ls -la .open-next/
-          echo "=== Checking for worker assets ==="
-          ls -la .open-next/assets/ || echo "No assets directory"
-          echo "=== Checking for worker file ==="
-          find .open-next -name "*.js" -o -name "_worker.js" | head -10
+        run: npx @opennextjs/cloudflare build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .open-next --project-name=name-concealed-poem
+        run: npx @opennextjs/cloudflare deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
