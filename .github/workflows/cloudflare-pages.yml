@@ -26,27 +26,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js app
-        run: npm run build
-
-      - name: Build for Cloudflare Pages
-        run: npx @cloudflare/next-on-pages
+      - name: Build with @opennextjs/cloudflare
+        run: npx @opennextjs/cloudflare
 
       - name: List build output
         run: |
           echo "=== Build output directory structure ==="
-          ls -la .vercel/output/static/
-          echo "=== Checking for index.html ==="
-          if [ -f .vercel/output/static/index.html ]; then
-            echo "index.html exists!"
-            head -20 .vercel/output/static/index.html
-          else
-            echo "index.html NOT found!"
-          fi
+          ls -la .open-next/
+          echo "=== Checking for worker assets ==="
+          ls -la .open-next/assets/ || echo "No assets directory"
+          echo "=== Checking for worker file ==="
+          find .open-next -name "*.js" -o -name "_worker.js" | head -10
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .vercel/output/static --project-name=name-concealed-poem
+          command: pages deploy .open-next --project-name=name-concealed-poem

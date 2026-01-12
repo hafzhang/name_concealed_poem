@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-export const runtime = 'edge';
-
 const getOpenAI = () => {
   return new OpenAI({
     apiKey: process.env.AI_API_KEY || '',

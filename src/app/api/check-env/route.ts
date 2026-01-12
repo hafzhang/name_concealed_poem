@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 
-export const runtime = 'edge';
-
 export async function GET() {
   return NextResponse.json({
     AI_MODEL_NAME: process.env.AI_MODEL_NAME || '未设置',
