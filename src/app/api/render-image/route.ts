@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import satori from 'satori';
 
+export const runtime = 'edge';
+
 // Font configuration mapping
 interface FontConfig {
   url: string;
