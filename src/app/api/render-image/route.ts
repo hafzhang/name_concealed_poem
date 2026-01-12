@@ -50,7 +50,7 @@ const getFontConfig = (style: string): FontConfig => {
       name: 'ZcoolXiaoWei'
     },
     mianhua: {
-      url: `${baseUrl}/fonts/mianhuatang.ttf`,
+      url: `${baseUrl}/fonts/mianhuatang.woff2`,
       name: 'mianhuatang'
     },
     marker: {

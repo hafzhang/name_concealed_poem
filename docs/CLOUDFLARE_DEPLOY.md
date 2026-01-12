@@ -129,7 +129,7 @@ const arrayBuffer = await response.arrayBuffer();
 | `qingliaolishu.ttf` | 隶书 |
 | `ShouJin.ttf` | 寿金 |
 | `zcool-xiaowei.woff` | 鸟虫 |
-| `mianhuatang.ttf` | 棉花堂 |
+| `mianhuatang.woff2` | 棉花堂 |
 | `lxgw-marker-gothic.woff` | 马克 |
 
 ### 3. 配置文件
