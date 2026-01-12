@@ -29,14 +29,18 @@ jobs:
       - name: Build with @opennextjs/cloudflare
         run: npx @opennextjs/cloudflare build
 
-      - name: Verify build output
+      - name: Prepare deployment structure
         run: |
-          echo "=== .open-next structure ==="
+          echo "=== Copying _routes.json to root ==="
+          cp public/_routes.json .open-next/_routes.json
+          echo "=== Copying worker.js to _worker.js ==="
+          cp .open-next/worker.js .open-next/_worker.js
+          echo "=== Final structure ==="
           ls -la .open-next/
-          echo "=== Checking worker.js ==="
-          test -f .open-next/worker.js && echo "✓ worker.js exists" || echo "✗ worker.js missing"
-          echo "=== Checking assets directory ==="
-          ls -la .open-next/assets/ | head -10
+          echo "=== Verifying _routes.json ==="
+          cat .open-next/_routes.json
+          echo "=== Verifying _worker.js exists ==="
+          test -f .open-next/_worker.js && echo "✓ _worker.js exists" || echo "✗ _worker.js missing"
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
