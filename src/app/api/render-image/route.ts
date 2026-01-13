@@ -68,6 +68,7 @@ const getFontConfig = (style: string): FontConfig => {
 
 // Helper to load fonts using fetch (Works in Cloudflare Workers)
 async function loadFont(style: string): Promise<{ name: string; data: ArrayBuffer }> {
+  const baseUrl = getBaseUrl();
   const fontConfig = getFontConfig(style);
 
   console.log(`Loading font ${fontConfig.name} from:`, fontConfig.url);
@@ -80,9 +81,34 @@ async function loadFont(style: string): Promise<{ name: string; data: ArrayBuffe
     }
     const arrayBuffer = await response.arrayBuffer();
     console.log(`Font ${fontConfig.name} loaded, size: ${arrayBuffer.byteLength} bytes`);
+
+    // Check if font data is empty (0 bytes)
+    if (arrayBuffer.byteLength === 0) {
+      throw new Error(`Font file is empty (0 bytes)`);
+    }
+
     return { name: fontConfig.name, data: arrayBuffer };
   } catch (error) {
     console.error(`Error loading font ${fontConfig.name}:`, error);
+
+    // Fallback to kaishu font if default font fails
+    if (fontConfig.name === 'NotoSerifSC') {
+      console.log('Attempting fallback to kaishu font...');
+      try {
+        const fallbackUrl = `${baseUrl}/fonts/kaishu.ttf`;
+        const fallbackResponse = await fetch(fallbackUrl);
+        if (fallbackResponse.ok) {
+          const fallbackArrayBuffer = await fallbackResponse.arrayBuffer();
+          if (fallbackArrayBuffer.byteLength > 0) {
+            console.log(`Fallback font loaded, size: ${fallbackArrayBuffer.byteLength} bytes`);
+            return { name: 'KaiShu', data: fallbackArrayBuffer };
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback font also failed:', fallbackError);
+      }
+    }
+
     throw new Error(`Failed to load font ${fontConfig.name}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

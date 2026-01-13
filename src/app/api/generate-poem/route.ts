@@ -5,7 +5,7 @@ export const runtime = 'edge';
 
 const getOpenAI = () => {
   return new OpenAI({
-    apiKey: process.env.AI_API_KEY || '',
+    apiKey: process.env.AI_API_KEY || process.env.API_KEY || '',
     baseURL: process.env.AI_BASE_URL || undefined,
     timeout: parseInt(process.env.AI_TIMEOUT || '60000', 10), // 默认 60 秒
   });
