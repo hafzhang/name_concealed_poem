@@ -1,117 +1,84 @@
 import { NextResponse } from 'next/server';
 import satori from 'satori';
 
+// Edge Runtime compatible - no native Node.js modules
 export const runtime = 'edge';
 
-// Font configuration mapping
-interface FontConfig {
-  url: string;
-  name: string;
-}
+// Helper to load fonts using fetch for Edge Runtime compatibility
+const loadFont = async (style: string) => {
+  let fontUrl: string;
+  let fontName = 'NotoSerifSC';
 
-// Get base URL for font loading (works in both Vercel and Cloudflare)
-const getBaseUrl = () => {
-  // In production, use the site URL
-  // In development, use localhost
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
+  // Map styles to font URLs (public folder URLs)
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : process.env.CF_PAGES_URL
+    ? process.env.CF_PAGES_URL
+    : 'http://localhost:3000';
+
+  switch (style) {
+    case 'kaishu':
+      fontUrl = `${baseUrl}/fonts/kaishu.ttf`;
+      fontName = 'KaiShu';
+      break;
+    case 'xingshu':
+      fontUrl = `${baseUrl}/fonts/zhi-mang-xing.woff`;
+      fontName = 'ZhiMangXing';
+      break;
+    case 'caoshu':
+      fontUrl = `${baseUrl}/fonts/liu-jian-mao-cao.woff`;
+      fontName = 'LiuJianMaoCao';
+      break;
+    case 'lishu':
+      fontUrl = `${baseUrl}/fonts/qingliaolishu.ttf`;
+      fontName = 'QingLiaoLiShu';
+      break;
+    case 'shoujin':
+      fontUrl = `${baseUrl}/fonts/ShouJin.ttf`;
+      fontName = 'ShouJin';
+      break;
+    case 'niaochong':
+      fontUrl = `${baseUrl}/fonts/zcool-xiaowei.woff`;
+      fontName = 'ZcoolXiaoWei';
+      break;
+    case 'mianhua':
+      fontUrl = `${baseUrl}/fonts/mianhuatang.woff2`;
+      fontName = 'mianhuatang';
+      break;
+    case 'marker':
+      fontUrl = `${baseUrl}/fonts/lxgw-marker-gothic.woff`;
+      fontName = 'LXGWMarkerGothic';
+      break;
+    default:
+      fontUrl = `${baseUrl}/fonts/NotoSerifSC.woff`;
+      fontName = 'NotoSerifSC';
+      break;
   }
-  // For server-side, we'll use relative paths
-  return '';
-};
 
-// Font URLs mapping - using public directory for local fonts
-const getFontConfig = (style: string): FontConfig => {
-  const baseUrl = getBaseUrl();
-
-  const fontMap: Record<string, FontConfig> = {
-    kaishu: {
-      url: `${baseUrl}/fonts/kaishu.ttf`,
-      name: 'KaiShu'
-    },
-    xingshu: {
-      url: `${baseUrl}/fonts/zhi-mang-xing.woff`,
-      name: 'ZhiMangXing'
-    },
-    caoshu: {
-      url: `${baseUrl}/fonts/liu-jian-mao-cao.woff`,
-      name: 'LiuJianMaoCao'
-    },
-    lishu: {
-      url: `${baseUrl}/fonts/qingliaolishu.ttf`,
-      name: 'QingLiaoLiShu'
-    },
-    shoujin: {
-      url: `${baseUrl}/fonts/ShouJin.ttf`,
-      name: 'ShouJin'
-    },
-    niaochong: {
-      url: `${baseUrl}/fonts/zcool-xiaowei.woff`,
-      name: 'ZcoolXiaoWei'
-    },
-    mianhua: {
-      url: `${baseUrl}/fonts/mianhuatang.woff2`,
-      name: 'mianhuatang'
-    },
-    marker: {
-      url: `${baseUrl}/fonts/lxgw-marker-gothic.woff`,
-      name: 'LXGWMarkerGothic'
-    },
-    default: {
-      url: `${baseUrl}/fonts/noto-serif-sc.woff`,
-      name: 'NotoSerifSC'
-    }
-  };
-
-  return fontMap[style] || fontMap.default;
-};
-
-// Helper to load fonts using fetch (Works in Cloudflare Workers)
-async function loadFont(style: string): Promise<{ name: string; data: ArrayBuffer }> {
-  const baseUrl = getBaseUrl();
-  const fontConfig = getFontConfig(style);
-
-  console.log(`Loading font ${fontConfig.name} from:`, fontConfig.url);
+  console.log(`Loading font ${fontName} from:`, fontUrl);
 
   try {
-    // Try fetching from public directory first
-    const response = await fetch(fontConfig.url);
+    const response = await fetch(fontUrl);
     if (!response.ok) {
       throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
     }
     const arrayBuffer = await response.arrayBuffer();
-    console.log(`Font ${fontConfig.name} loaded, size: ${arrayBuffer.byteLength} bytes`);
-
-    // Check if font data is empty (0 bytes)
-    if (arrayBuffer.byteLength === 0) {
-      throw new Error(`Font file is empty (0 bytes)`);
+    console.log(`Font ${fontName} loaded, size: ${arrayBuffer.byteLength} bytes`);
+    return { name: fontName, data: arrayBuffer };
+  } catch (e) {
+    console.error(`Failed to load font from ${fontUrl}`, e);
+    // Fallback to NotoSerifSC
+    try {
+      const fallbackUrl = `${baseUrl}/fonts/NotoSerifSC.woff`;
+      const response = await fetch(fallbackUrl);
+      if (!response.ok) throw new Error(`Failed to fetch fallback font: ${response.status}`);
+      const arrayBuffer = await response.arrayBuffer();
+      return { name: 'NotoSerifSC', data: arrayBuffer };
+    } catch (e2) {
+      throw new Error(`Font file not found: ${String(e)}, ${String(e2)}`);
     }
-
-    return { name: fontConfig.name, data: arrayBuffer };
-  } catch (error) {
-    console.error(`Error loading font ${fontConfig.name}:`, error);
-
-    // Fallback to kaishu font if default font fails
-    if (fontConfig.name === 'NotoSerifSC') {
-      console.log('Attempting fallback to kaishu font...');
-      try {
-        const fallbackUrl = `${baseUrl}/fonts/kaishu.ttf`;
-        const fallbackResponse = await fetch(fallbackUrl);
-        if (fallbackResponse.ok) {
-          const fallbackArrayBuffer = await fallbackResponse.arrayBuffer();
-          if (fallbackArrayBuffer.byteLength > 0) {
-            console.log(`Fallback font loaded, size: ${fallbackArrayBuffer.byteLength} bytes`);
-            return { name: 'KaiShu', data: fallbackArrayBuffer };
-          }
-        }
-      } catch (fallbackError) {
-        console.error('Fallback font also failed:', fallbackError);
-      }
-    }
-
-    throw new Error(`Failed to load font ${fontConfig.name}: ${error instanceof Error ? error.message : String(error)}`);
   }
-}
+};
 
 import { SilkScroll } from './mountings/SilkScroll';
 import { Redwood } from './mountings/Redwood';
@@ -168,10 +135,20 @@ export async function POST(req: Request) {
 
     const gapSize = getGapSize(poemLength);
 
+    // Load fallback font (NotoSerifSC) to prevent blank text if main font fails or misses glyphs
+    let fallbackFontInfo = null;
+    if (fontInfo.name !== 'NotoSerifSC') {
+        try {
+            fallbackFontInfo = await loadFont('default');
+        } catch (e) {
+            console.error('Failed to load fallback font', e);
+        }
+    }
+
     // Helper to render complex frames
     const renderFrame = (frameType: string, children: any[]) => {
       const commonStyle = { display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' };
-
+      
       switch (frameType) {
         // --- Traditional / Classic Styles ---
         case 'silk_scroll': // 绫罗卷轴
@@ -196,7 +173,7 @@ export async function POST(req: Request) {
             return ChampagneGold({ children });
         case 'azure_porcelain': // 青瓷纹饰
             return AzurePorcelain({ children });
-
+        
         default: // 'none' and fallback
            return {
              type: 'div',
@@ -232,7 +209,7 @@ export async function POST(req: Request) {
                   fontSize: `${fontSize}px`,  // 使用动态计算的字体大小
                   lineHeight: '1.2',
                   color: '#1c1917',
-                  fontFamily: fontInfo.name,
+                  fontFamily: fallbackFontInfo ? `${fontInfo.name}, ${fallbackFontInfo.name}` : fontInfo.name,
                 },
                 children: (line || '').split('').map((char, j) => ({
                   type: 'div',
@@ -305,7 +282,7 @@ export async function POST(req: Request) {
                   children: sealText.split('').map((char: string, i: number) => ({
                     type: 'div',
                     key: `seal-${i}`,
-                    props: {
+                    props: { 
                       children: char,
                       style: { lineHeight: '1' }
                     }
@@ -317,7 +294,7 @@ export async function POST(req: Request) {
       }
     ];
 
-    // Satori rendering - return SVG directly (no PNG conversion for Edge Runtime compatibility)
+    // Satori rendering - returns SVG directly for Edge Runtime compatibility
     const svg = await satori(
       renderFrame(frame, poemElements) as any,
       {
@@ -330,18 +307,25 @@ export async function POST(req: Request) {
             weight: 400,
             style: 'normal',
           },
+          ...(fallbackFontInfo ? [{
+            name: fallbackFontInfo.name,
+            data: fallbackFontInfo.data,
+            weight: 400,
+            style: 'normal',
+          } as const] : []),
         ],
       }
     );
 
-    // Return SVG as base64 data URI (works in Edge Runtime)
-    const base64Svg = btoa(unescape(encodeURIComponent(svg)));
-    const svgImage = `data:image/svg+xml;base64,${base64Svg}`;
+    // Return SVG as base64 data URI for Edge Runtime compatibility
+    // Client can convert to PNG if needed using canvas or other libraries
+    const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
 
     return NextResponse.json({
       success: true,
       data: {
-        imageUrl: svgImage,
+        imageUrl: base64Svg,
+        format: 'svg',
         remainingCredits: 2
       }
     });

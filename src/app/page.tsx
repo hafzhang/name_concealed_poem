@@ -336,7 +336,7 @@ export default function Home() {
               </div>
               <a
                 href={imageUrl}
-                download={`name_poem_${new Date().getTime()}.png`}
+                download={`name_poem_${new Date().getTime()}.svg`}
                 className="w-full flex items-center justify-center gap-2 bg-stone-900 text-white px-4 py-3 rounded-lg hover:bg-stone-800"
               >
                 <Download className="w-4 h-4" />
