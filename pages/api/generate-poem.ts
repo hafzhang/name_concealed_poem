@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 
-export const runtime = 'edge';
+export const config = {
+  runtime: 'edge',
+};
 
 const getOpenAI = () => {
   return new OpenAI({
@@ -21,10 +23,14 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export async function POST(req: Request) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
   try {
     // 接收参数：name 是前端已处理过的名字，与 lineCount 匹配
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = await req.json();
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
 
     // 注意：name 是前端已经处理过的名字
     // - lineCount=2 时，name 长度一定是 2
@@ -32,9 +38,8 @@ export async function POST(req: Request) {
     // - lineCount=6 时，name 长度可能是 2-4
 
     if (!name || name.length < 2) {
-      return NextResponse.json(
-        { success: false, error: '名字至少需要2个字符' },
-        { status: 400 }
+      return res.status(400).json(
+        { success: false, error: '名字至少需要2个字符' }
       );
     }
 
@@ -110,13 +115,12 @@ export async function POST(req: Request) {
     } catch (e) {
       console.error('JSON Parse Error:', e);
       // Fallback if JSON parsing fails
-      return NextResponse.json(
-        { success: false, error: 'Failed to parse AI response' },
-        { status: 500 }
+      return res.status(500).json(
+        { success: false, error: 'Failed to parse AI response' }
       );
     }
 
-    return NextResponse.json({
+    return res.json({
       success: true,
       data: {
         poem: result.poem,
@@ -130,9 +134,8 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || 'Failed to generate poem' },
-      { status: 500 }
+    return res.status(500).json(
+      { success: false, error: error.message || 'Failed to generate poem' }
     );
   }
 }

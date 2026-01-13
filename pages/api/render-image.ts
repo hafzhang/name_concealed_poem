@@ -1,8 +1,10 @@
-import { NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import satori from 'satori';
 
 // Edge Runtime compatible - no native Node.js modules
-export const runtime = 'edge';
+export const config = {
+  runtime: 'edge',
+};
 
 // Helper to load fonts using fetch for Edge Runtime compatibility
 const loadFont = async (style: string) => {
@@ -80,25 +82,28 @@ const loadFont = async (style: string) => {
   }
 };
 
-import { SilkScroll } from './mountings/SilkScroll';
-import { Redwood } from './mountings/Redwood';
-import { GoldenWood } from './mountings/GoldenWood';
-import { CloudBrocade } from './mountings/CloudBrocade';
-import { ModernBlack } from './mountings/ModernBlack';
-import { SakuraPink } from './mountings/SakuraPink';
-import { MintGreen } from './mountings/MintGreen';
-import { LavenderMist } from './mountings/LavenderMist';
-import { ChampagneGold } from './mountings/ChampagneGold';
-import { AzurePorcelain } from './mountings/AzurePorcelain';
+import { SilkScroll } from './render-image/SilkScroll';
+import { Redwood } from './render-image/Redwood';
+import { GoldenWood } from './render-image/GoldenWood';
+import { CloudBrocade } from './render-image/CloudBrocade';
+import { ModernBlack } from './render-image/ModernBlack';
+import { SakuraPink } from './render-image/SakuraPink';
+import { MintGreen } from './render-image/MintGreen';
+import { LavenderMist } from './render-image/LavenderMist';
+import { ChampagneGold } from './render-image/ChampagneGold';
+import { AzurePorcelain } from './render-image/AzurePorcelain';
 
-export async function POST(req: Request) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  }
+
   try {
-    const { poem, style, bg, frame, name, lineCount = 4 } = await req.json();
+    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid poem data' },
-        { status: 400 }
+      return res.status(400).json(
+        { success: false, error: 'Invalid poem data' }
       );
     }
 
@@ -148,7 +153,7 @@ export async function POST(req: Request) {
     // Helper to render complex frames
     const renderFrame = (frameType: string, children: any[]) => {
       const commonStyle = { display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' };
-      
+
       switch (frameType) {
         // --- Traditional / Classic Styles ---
         case 'silk_scroll': // 绫罗卷轴
@@ -173,7 +178,7 @@ export async function POST(req: Request) {
             return ChampagneGold({ children });
         case 'azure_porcelain': // 青瓷纹饰
             return AzurePorcelain({ children });
-        
+
         default: // 'none' and fallback
            return {
              type: 'div',
@@ -282,7 +287,7 @@ export async function POST(req: Request) {
                   children: sealText.split('').map((char: string, i: number) => ({
                     type: 'div',
                     key: `seal-${i}`,
-                    props: { 
+                    props: {
                       children: char,
                       style: { lineHeight: '1' }
                     }
@@ -321,7 +326,7 @@ export async function POST(req: Request) {
     // Client can convert to PNG if needed using canvas or other libraries
     const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
 
-    return NextResponse.json({
+    return res.json({
       success: true,
       data: {
         imageUrl: base64Svg,
@@ -332,9 +337,8 @@ export async function POST(req: Request) {
 
   } catch (error) {
     console.error('Error rendering image:', error);
-    return NextResponse.json(
-      { success: false, error: `Failed to render image: ${error instanceof Error ? error.message : String(error)}`, stack: error instanceof Error ? error.stack : undefined },
-      { status: 500 }
+    return res.status(500).json(
+      { success: false, error: `Failed to render image: ${error instanceof Error ? error.message : String(error)}`, stack: error instanceof Error ? error.stack : undefined }
     );
   }
 }
