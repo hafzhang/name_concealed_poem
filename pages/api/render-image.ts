@@ -82,16 +82,16 @@ const loadFont = async (style: string) => {
   }
 };
 
-import { SilkScroll } from './render-image/SilkScroll';
-import { Redwood } from './render-image/Redwood';
-import { GoldenWood } from './render-image/GoldenWood';
-import { CloudBrocade } from './render-image/CloudBrocade';
-import { ModernBlack } from './render-image/ModernBlack';
-import { SakuraPink } from './render-image/SakuraPink';
-import { MintGreen } from './render-image/MintGreen';
-import { LavenderMist } from './render-image/LavenderMist';
-import { ChampagneGold } from './render-image/ChampagneGold';
-import { AzurePorcelain } from './render-image/AzurePorcelain';
+import { SilkScroll } from '../../src/lib/render-image/SilkScroll';
+import { Redwood } from '../../src/lib/render-image/Redwood';
+import { GoldenWood } from '../../src/lib/render-image/GoldenWood';
+import { CloudBrocade } from '../../src/lib/render-image/CloudBrocade';
+import { ModernBlack } from '../../src/lib/render-image/ModernBlack';
+import { SakuraPink } from '../../src/lib/render-image/SakuraPink';
+import { MintGreen } from '../../src/lib/render-image/MintGreen';
+import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
+import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
+import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
