@@ -31,6 +31,8 @@ jobs:
 
       - name: Build with @cloudflare/next-on-pages
         run: npx @cloudflare/next-on-pages
+        env:
+          NPM_FLAGS: --legacy-peer-deps
 
       - name: Verify build output
         run: |
