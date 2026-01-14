@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useGuestId } from '@/lib/hooks/useGuestId';
 import { usePoemGenerator } from '@/hooks/usePoemGenerator';
-import { Loader2, Send, Download, RefreshCw, ArrowLeft } from 'lucide-react';
+import { Loader2, Send, Download, RefreshCw, ArrowLeft, ChevronDown, ChevronUp, PenLine } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type Step = 'input' | 'generating_poem' | 'review' | 'generating_image' | 'result';
@@ -25,7 +25,6 @@ export default function Home() {
   const [poemData, setPoemData] = useState<PoemData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // 使用 Hook 管理风格选择、行数选择、分类展开状态
   const {
     lineCount,
     styleKeyword,
@@ -40,11 +39,7 @@ export default function Home() {
   const handleGeneratePoem = async () => {
     if (!name || name.length < 2) return;
     setStep('generating_poem');
-
-    // 使用 Hook 生成请求参数（包含名字处理逻辑）
     const params = generateRequestParams(name, style);
-
-    console.log(`生成藏头诗 - 原始名字: ${name}, 处理后名字: ${params.name}, 行数: ${params.lineCount}`);
 
     try {
       const res = await fetch('/api/generate-poem', {
@@ -84,7 +79,7 @@ export default function Home() {
           style,
           bg: 'rice_paper',
           frame,
-          name // Pass name for the seal
+          name
         })
       });
       const data = await res.json();
@@ -104,22 +99,43 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-stone-50 text-stone-800">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-stone-900 mb-2 font-serif">姓名藏诗</h1>
-          <p className="text-stone-600">国风书法 · 专属定制</p>
+    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+      {/* 装饰背景 */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-red-800 rounded-full filter blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-800 rounded-full filter blur-3xl translate-x-1/2 translate-y-1/2"></div>
+      </div>
+
+      <div className="relative z-10 max-w-lg mx-auto px-4 py-8">
+        {/* 标题区域 */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-700 to-red-900 rounded-full mb-4 shadow-lg">
+            <PenLine className="w-8 h-8 text-amber-100" />
+          </div>
+          <h1 className="text-5xl font-bold text-red-900 mb-3 tracking-wider" style={{ fontFamily: '"Noto Serif SC", serif' }}>
+            姓名藏诗
+          </h1>
+          <p className="text-lg text-red-700 font-medium tracking-wide">国风书法 · 专属定制</p>
+          <div className="flex items-center justify-center gap-3 mt-4">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-red-400"></div>
+            <div className="text-red-400 text-xs">✦ 传世经典 ✦</div>
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-red-400"></div>
+          </div>
         </div>
 
         {step === 'input' && (
-          <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-amber-200/50 p-6 space-y-6">
+            {/* 姓名输入 */}
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-2">请输入姓名 (2-4字)</label>
+              <label className="block text-sm font-semibold text-red-900 mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 bg-red-600 rounded-full"></span>
+                请输入姓名 (2-4字)
+              </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-500 outline-none transition"
+                className="w-full px-5 py-4 rounded-xl border-2 border-amber-200 focus:border-red-500 focus:ring-4 focus:ring-red-100 outline-none transition text-lg bg-amber-50/50"
                 placeholder="例如：李清照"
                 maxLength={4}
               />
@@ -127,10 +143,10 @@ export default function Home() {
 
             {/* 几行诗选择 */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
-                <h3 className="font-medium text-stone-800">几行诗</h3>
-              </div>
+              <label className="block text-sm font-semibold text-red-900 flex items-center gap-2">
+                <span className="w-2 h-2 bg-red-600 rounded-full"></span>
+                几行诗
+              </label>
               <div className="flex gap-3">
                 {[2, 4, 6].map((num) => (
                   <button
@@ -138,59 +154,54 @@ export default function Home() {
                     type="button"
                     onClick={() => setLineCount(num)}
                     className={cn(
-                      "px-4 py-2 rounded-lg border text-sm transition-all flex-1",
+                      "flex-1 py-3 px-4 rounded-xl border-2 text-base font-medium transition-all relative overflow-hidden",
                       lineCount === num
-                        ? "bg-stone-800 text-white border-stone-800"
-                        : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
+                        ? "bg-gradient-to-br from-red-600 to-red-700 text-white border-red-600 shadow-lg"
+                        : "bg-white text-red-700 border-amber-200 hover:border-red-300 hover:bg-red-50"
                     )}
                   >
                     {num}行
                   </button>
                 ))}
               </div>
-              {lineCount === 2 && name.length >= 3 && (
-                <p className="text-xs text-stone-500">提示：2行诗将使用名字的后两个字</p>
-              )}
             </div>
 
             {/* 风格选择 - 分类展示 */}
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
-                <h3 className="font-medium text-stone-800">风格</h3>
-              </div>
+              <label className="block text-sm font-semibold text-red-900 flex items-center gap-2">
+                <span className="w-2 h-2 bg-red-600 rounded-full"></span>
+                风格
+              </label>
 
-              {/* 按分类渲染风格选项 */}
               {Object.entries(STYLE_CATEGORIES).map(([category, styles]) => (
-                <div key={category} className="space-y-2">
+                <div key={category} className="rounded-xl border border-amber-100 overflow-hidden">
                   {/* 分类标题（可点击展开/收起） */}
                   <button
                     type="button"
                     onClick={() => toggleCategory(category)}
-                    className="flex items-center justify-between w-full text-left px-2 py-1 hover:bg-stone-50 rounded"
+                    className="w-full flex items-center justify-between px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-colors"
                   >
-                    <span className="text-sm font-medium text-stone-700">{category}</span>
-                    <span className={cn(
-                      "text-stone-400 transition-transform text-xs",
-                      expandedCategories[category] ? "rotate-180" : ""
-                    )}>
-                      ▼
-                    </span>
+                    <span className="font-medium text-red-900">{category}</span>
+                    {expandedCategories[category] !== false ? (
+                      <ChevronUp className="w-5 h-5 text-red-600" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-red-600" />
+                    )}
                   </button>
 
                   {/* 风格按钮网格 */}
                   {expandedCategories[category] !== false && (
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="p-3 bg-white grid grid-cols-3 gap-2">
                       {styles.map((s) => (
                         <button
                           key={s}
                           type="button"
                           onClick={() => setStyleKeyword(s)}
                           className={cn(
-                            "px-3 py-2 rounded-lg text-sm border transition-colors cursor-pointer select-none",
+                            "px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
                             styleKeyword === s
-                              ? "bg-stone-800 text-white border-stone-800"
-                              : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
+                              ? "bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md"
+                              : "text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200"
                           )}
                         >
                           {s}
@@ -206,72 +217,80 @@ export default function Home() {
                 type="text"
                 value={styleKeyword}
                 onChange={(e) => setStyleKeyword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-stone-300 focus:ring-2 focus:ring-stone-500 outline-none transition"
+                className="w-full px-5 py-3 rounded-xl border-2 border-amber-200 focus:border-red-500 focus:ring-4 focus:ring-red-100 outline-none transition bg-amber-50/50"
                 placeholder={styleKeyword ? "" : "或输入自定义风格..."}
                 maxLength={10}
               />
             </div>
 
+            {/* 立即生成按钮 */}
             <button
               onClick={handleGeneratePoem}
               disabled={!name || name.length < 2}
-              className="w-full bg-stone-900 text-white py-3 rounded-lg font-medium hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              className={cn(
+                "w-full py-4 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2 shadow-lg",
+                !name || name.length < 2
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-red-200 hover:shadow-xl hover:shadow-red-300"
+              )}
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
               立即生成
             </button>
           </div>
         )}
 
         {step === 'generating_poem' && (
-          <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-stone-400 mb-4" />
-            <p className="text-stone-500 animate-pulse">正在以此名作诗...</p>
+          <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-red-600 mb-4" />
+            <p className="text-lg text-red-700 animate-pulse">正在以此名作诗...</p>
           </div>
         )}
 
         {step === 'review' && poemData && (
-          <div className="space-y-6 bg-white p-8 rounded-xl shadow-sm border border-stone-200">
-             <div className="space-y-2 text-center">
-               {poemData.poem.map((line, i) => (
-                 <p key={i} className="text-xl font-serif text-stone-800 tracking-widest">{line}</p>
-               ))}
-             </div>
-             <p className="text-xs text-stone-500 text-center border-t border-stone-100 pt-4">
-               {poemData.explanation}
-             </p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-amber-200/50 p-8 space-y-6">
+            <div className="text-center pb-6 border-b border-amber-200">
+              {poemData.poem.map((line, i) => (
+                <p key={i} className="text-2xl font-serif text-red-900 tracking-widest my-2" style={{ fontFamily: '"Noto Serif SC", serif' }}>
+                  {line}
+                </p>
+              ))}
+            </div>
+            <p className="text-sm text-red-600 text-center bg-red-50 py-3 rounded-lg">
+              {poemData.explanation}
+            </p>
 
-             <div>
-               <label className="block text-sm font-medium text-stone-700 mb-2">选择风格</label>
-               <div className="grid grid-cols-2 gap-3">
-                 {['kaishu', 'xingshu', 'caoshu', 'lishu', 'shoujin', 'mianhua'].map((s) => (
-                   <button
-                     key={s}
-                     onClick={() => setStyle(s)}
-                     className={cn(
-                       "px-4 py-2 rounded-lg border text-sm transition-all",
-                       style === s
-                         ? "bg-stone-800 text-white border-stone-800"
-                         : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
-                     )}
-                   >
-                     {s === 'kaishu' && '楷书 · 端正'}
-                     {s === 'xingshu' && '行书 · 飘逸'}
-                     {s === 'caoshu' && '草书 · 狂野'}
-                     {s === 'lishu' && '隶书 · 古朴'}
-                     {s === 'shoujin' && '瘦金体 · 清冷'}
+            <div>
+              <label className="block text-sm font-semibold text-red-900 mb-3">选择书法风格</label>
+              <div className="grid grid-cols-2 gap-3">
+                {['kaishu', 'xingshu', 'caoshu', 'lishu', 'shoujin', 'mianhua'].map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setStyle(s)}
+                    className={cn(
+                      "px-4 py-3 rounded-lg text-sm font-medium transition-all",
+                      style === s
+                        ? "bg-gradient-to-br from-red-500 to-red-600 text-white shadow-md"
+                        : "bg-white text-red-700 border border-amber-200 hover:border-red-300"
+                    )}
+                  >
+                    {s === 'kaishu' && '楷书 · 端正'}
+                    {s === 'xingshu' && '行书 · 飘逸'}
+                    {s === 'caoshu' && '草书 · 狂野'}
+                    {s === 'lishu' && '隶书 · 古朴'}
+                    {s === 'shoujin' && '瘦金体 · 清冷'}
                     {s === 'mianhua' && '棉花糖 · 俏皮'}
-                   </button>
-                 ))}
-               </div>
-             </div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
-             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-2">选择装裱</label>
+            <div>
+              <label className="block text-sm font-semibold text-red-900 mb-3">选择装裱</label>
               <select
                 value={frame}
                 onChange={(e) => setFrame(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="w-full px-4 py-3 rounded-lg border-2 border-amber-200 focus:border-red-500 focus:ring-4 focus:ring-red-100 outline-none transition bg-amber-50/50"
               >
                 <option value="none">无框 (宣纸原浆)</option>
                 <option value="silk_scroll">绫罗卷轴</option>
@@ -284,36 +303,35 @@ export default function Home() {
                 <option value="lavender_mist">紫气东来 (紫)</option>
                 <option value="champagne_gold">流金岁月 (金)</option>
               </select>
-             </div>
+            </div>
 
-             <div className="flex gap-3">
-               <button
-                 onClick={() => setStep('input')}
-                 className="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-stone-600 text-sm hover:bg-stone-50"
-               >
-                 返回修改
-               </button>
-               <button
-                 onClick={handleRenderImage}
-                 className="flex-1 bg-stone-900 text-white px-4 py-2 rounded-lg text-sm hover:bg-stone-800"
-               >
-                 生成书法图
-               </button>
-             </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep('input')}
+                className="flex-1 px-4 py-3 border-2 border-amber-200 rounded-lg text-red-700 font-medium hover:bg-amber-50 transition-colors"
+              >
+                返回修改
+              </button>
+              <button
+                onClick={handleRenderImage}
+                className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-3 rounded-lg font-medium hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all"
+              >
+                生成书法图
+              </button>
+            </div>
           </div>
         )}
 
         {step === 'generating_image' && (
-          <div className="text-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-stone-400 mb-4" />
-            <p className="text-stone-500 animate-pulse">正在挥毫泼墨...</p>
+          <div className="text-center py-16 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-red-600 mb-4" />
+            <p className="text-lg text-red-700 animate-pulse">正在挥毫泼墨...</p>
           </div>
         )}
 
         {step === 'result' && imageUrl && (
           <div className="space-y-6">
-            <div className="relative aspect-[2/3] w-full bg-stone-200 rounded-lg overflow-hidden shadow-lg">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+            <div className="relative aspect-[2/3] w-full bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-200">
               <img src={imageUrl} alt="Generated Poem" className="w-full h-full object-cover" />
             </div>
 
@@ -321,14 +339,14 @@ export default function Home() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep('review')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-stone-200 rounded-lg text-stone-600 bg-white hover:bg-stone-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-amber-200 rounded-lg text-red-700 bg-white hover:bg-amber-50 font-medium transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   返回调整
                 </button>
                 <button
                   onClick={() => setStep('input')}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border border-stone-200 rounded-lg text-stone-600 bg-white hover:bg-stone-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-amber-200 rounded-lg text-red-700 bg-white hover:bg-amber-50 font-medium transition-colors"
                 >
                   <RefreshCw className="w-4 h-4" />
                   再来一首
@@ -337,14 +355,19 @@ export default function Home() {
               <a
                 href={imageUrl}
                 download={`name_poem_${new Date().getTime()}.svg`}
-                className="w-full flex items-center justify-center gap-2 bg-stone-900 text-white px-4 py-3 rounded-lg hover:bg-stone-800"
+                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-4 rounded-xl font-medium hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all text-lg"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-5 h-5" />
                 保存图片
               </a>
             </div>
           </div>
         )}
+
+        {/* 底部装饰 */}
+        <div className="text-center mt-8 text-red-400 text-sm">
+          <p>✦ 每一首诗都是独一无二的艺术品 ✦</p>
+        </div>
       </div>
     </main>
   );
