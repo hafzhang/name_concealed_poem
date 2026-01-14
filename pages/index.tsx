@@ -75,13 +75,13 @@ export default function Home() {
     try {
       const res = await fetch('/api/render-image', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'X-Guest-ID': guestId || ''
         },
-        body: JSON.stringify({ 
-          poem: poemData.poem, 
-          style, 
+        body: JSON.stringify({
+          poem: poemData.poem,
+          style,
           bg: 'rice_paper',
           frame,
           name // Pass name for the seal
@@ -250,8 +250,8 @@ export default function Home() {
                      onClick={() => setStyle(s)}
                      className={cn(
                        "px-4 py-2 rounded-lg border text-sm transition-all",
-                       style === s 
-                         ? "bg-stone-800 text-white border-stone-800" 
+                       style === s
+                         ? "bg-stone-800 text-white border-stone-800"
                          : "bg-white text-stone-600 border-stone-200 hover:border-stone-400"
                      )}
                    >
@@ -265,11 +265,11 @@ export default function Home() {
                  ))}
                </div>
              </div>
-             
+
              <div>
               <label className="block text-sm font-medium text-stone-700 mb-2">选择装裱</label>
-              <select 
-                value={frame} 
+              <select
+                value={frame}
                 onChange={(e) => setFrame(e.target.value)}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               >
@@ -316,7 +316,7 @@ export default function Home() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={imageUrl} alt="Generated Poem" className="w-full h-full object-cover" />
             </div>
-            
+
             <div className="flex flex-col gap-3">
               <div className="flex gap-3">
                 <button

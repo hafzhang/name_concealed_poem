@@ -1,5 +1,3 @@
-"use client";
-
 import React from 'react';
 import { autoMounting } from '@/hoc/autoMounting';
 
@@ -42,7 +40,7 @@ PoemC.displayName = 'PoemC';
 // 2. 使用高阶组件包装
 // 创建一组不同名称的组件来展示各种纹理和配色
 const DemoVariants = [
-  'CloudMist', 'DragonScale', 'AncientRune', 'StarDust', 'BambooWeave', 
+  'CloudMist', 'DragonScale', 'AncientRune', 'StarDust', 'BambooWeave',
   'SpringFlower', 'PaperTexture', 'DiamondGrid', 'JadePlate', 'RoyalSilk',
   'InkSplash', 'GoldenAge', 'MysticRiver', 'SilentMountain', 'RedPhoenix'
 ].map(name => {
@@ -67,7 +65,7 @@ export default function DemoPage() {
       <p className="text-center text-slate-500 mb-12">
         不仅零手工，现在还拥有了：增强纹理、中国传统色、边角装饰、Base64 稳定渲染。
       </p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-[1600px] mx-auto">
         {DemoVariants.map(({ name, Component }) => (
           <div key={name} className="flex flex-col items-center">
@@ -78,7 +76,7 @@ export default function DemoPage() {
           </div>
         ))}
       </div>
-      
+
       <div className="mt-12 text-center text-slate-500">
         <p>每种风格完全由组件名称（Seed）确定。刷新页面风格不会变。</p>
       </div>
