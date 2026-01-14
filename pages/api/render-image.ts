@@ -3,7 +3,7 @@ import satori from 'satori';
 
 // Edge Runtime compatible - no native Node.js modules
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 };
 
 // Helper to load fonts using fetch for Edge Runtime compatibility
