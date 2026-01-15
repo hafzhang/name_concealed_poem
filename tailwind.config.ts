@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class', // Disable automatic dark mode based on system preference
   content: [
     // Ensure all paths are covered
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
