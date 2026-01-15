@@ -86,6 +86,9 @@ import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Set JSON header first
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }

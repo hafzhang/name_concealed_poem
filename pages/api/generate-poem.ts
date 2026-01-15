@@ -1,16 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import OpenAI from 'openai';
 
 export const config = {
   runtime: 'edge',
-};
-
-const getOpenAI = () => {
-  return new OpenAI({
-    apiKey: process.env.AI_API_KEY || process.env.API_KEY || '',
-    baseURL: process.env.AI_BASE_URL || undefined,
-    timeout: parseInt(process.env.AI_TIMEOUT || '60000', 10),
-  });
 };
 
 const styleMap: Record<string, string> = {
@@ -23,6 +14,9 @@ const styleMap: Record<string, string> = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // Set JSON header first
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
@@ -67,23 +61,49 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     "explanation": "对这首诗的简短意境赏析"
 }`;
 
-    console.log(`生成藏头诗 - 名字: ${name}, 原始名字: ${originalName || name}, 行数: ${lineCount}, 格式: ${formatInstruction}`);
+    const apiKey = process.env.AI_API_KEY || process.env.API_KEY || '';
+    const baseURL = process.env.AI_BASE_URL || 'https://api.openai.com/v1';
+    const modelName = process.env.AI_MODEL_NAME || 'gpt-4';
+    const timeout = parseInt(process.env.AI_TIMEOUT || '60000', 10);
 
-    const client = getOpenAI();
-    const completion = await client.chat.completions.create({
-      model: process.env.AI_MODEL_NAME || 'gpt-4',
-      messages: [
-        { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
-      stream: false,
+    // Use native fetch for edge runtime compatibility
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const response = await fetch(`${baseURL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: modelName,
+        messages: [
+          { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.7,
+        stream: false,
+      }),
+      signal: controller.signal,
     });
 
-    const content = completion.choices[0].message.content;
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('AI API error:', response.status, errorText);
+      return res.status(500).json({
+        success: false,
+        error: `AI API error: ${response.status} ${response.statusText}`
+      });
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error('No content received from AI');
+      return res.status(500).json({ success: false, error: 'No content received from AI' });
     }
 
     let jsonStr = content.trim();
