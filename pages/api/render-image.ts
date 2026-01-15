@@ -335,7 +335,10 @@ export default async function handler(req: Request) {
 
     return new Response(JSON.stringify({
       success: true,
-      data: base64Svg
+      data: {
+        imageUrl: base64Svg,
+        format: 'svg'
+      }
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
