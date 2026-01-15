@@ -32,29 +32,25 @@ export default async function handler(req: Request) {
 
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
 
-    let formatInstruction = "五言绝句";
     let acrosticInstruction = "必须是藏头诗，共四句。每句的第一个字依次是";
     let poemCount = 4;
 
     if (lineCount === 2) {
-      formatInstruction = "五言对联";
       acrosticInstruction = "必须是藏头对联，共两句。每句的第一个字依次是";
       poemCount = 2;
     } else if (lineCount === 6) {
-      formatInstruction = "六句五言诗";
       acrosticInstruction = "前三句必须是藏头，第1-3句的第一个字依次是";
       poemCount = 6;
     }
 
     const poemTemplate = Array.from({ length: poemCount }, (_, i) => `第${i + 1}句`);
 
-    const prompt = `你是一个国学大师。请为"${name}"创作一首${formatInstruction}。
+    const prompt = `你是一个国学大师。请为"${name}"创作一首藏头诗。
 
 要求：
 1. ${acrosticInstruction}"${name}"中的字。${lineCount === 6 ? '第4-6句自由发挥，不重复姓名，但需与前文意境连贯。' : ''}
-2. 意境：${literaryStyle}，要求意境优美、寓意深远、格调高雅
-3. 内容：整体积极向上，含赞美、祝福或美好期许之意
-4. 语义：诗句之间衔接自然，前后贯通，避免生硬拼凑
+2. 意境：${literaryStyle}，要求含赞美、祝福或美好期许之意
+3. 语义：诗句之间衔接自然，前后贯通，避免生硬拼凑
 
 【返回格式】
 仅返回纯JSON对象，不要添加任何解释性文字：

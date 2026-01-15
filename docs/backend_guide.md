@@ -76,7 +76,7 @@ export async function POST(req: Request) {
   const { name, style } = await req.json();
 
   // 1. 构造 Prompt
-  const prompt = `角色：国学大师。任务：为"${name}"写一首五言绝句藏头诗...`; // (参考产品文档)
+  const  = `角色：国学大师。任务：为"${name}"写一首藏头诗...`; // (参考产品文档)
 
   try {
     // 2. 调用 LLM

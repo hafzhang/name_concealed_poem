@@ -226,24 +226,20 @@ export async function POST(req: Request) {
     // ... 校验逻辑 ...
 
     // 动态构建 Prompt（根据行数调整格式）
-    let formatInstruction = "五言绝句";
     let lineInstruction = "共四句。";
-
     if (lineCount === 2) {
-      formatInstruction = "五言对联";
       lineInstruction = "共两句。";
     } else if (lineCount === 6) {
-      formatInstruction = "六句五言诗";
       lineInstruction = "共六句。";
     }
     // lineCount === 4 时使用默认值
 
-    const prompt = `你是一个国学大师。请为"${name}"创作一首${formatInstruction}藏头诗。
+    const prompt = `你是一个国学大师。请为"${name}"创作一首藏头诗。
 
 要求：
 1. 必须是藏头诗，${lineInstruction}每句的第一个字依次是"${name}"中的字。
-2. 意境：${literaryStyle}，要求意境优美、寓意深远、格调高雅
-3. 内容：整体积极向上，含赞美、祝福或美好期许之意
+2. 意境：${literaryStyle}，要求意境优美
+3. 内容：整体积极向上，含赞美、祝福之意
 4. 语义：诗句之间衔接自然，前后贯通，避免生硬拼凑
 
 【返回格式】

@@ -104,25 +104,190 @@ export default async function handler(req: Request) {
       });
     }
 
-    let Component;
-    switch (bg) {
-      case 'silk_scroll': Component = SilkScroll; break;
-      case 'redwood': Component = Redwood; break;
-      case 'golden_wood': Component = GoldenWood; break;
-      case 'cloud_brocade': Component = CloudBrocade; break;
-      case 'modern_black': Component = ModernBlack; break;
-      case 'sakura_pink': Component = SakuraPink; break;
-      case 'mint_green': Component = MintGreen; break;
-      case 'lavender_mist': Component = LavenderMist; break;
-      case 'champagne_gold': Component = ChampagneGold; break;
-      case 'azure_porcelain': Component = AzurePorcelain; break;
-      default: Component = SilkScroll;
-    }
-
+    // Load font
     const fontData = await loadFont(style);
 
+    // Load fallback font
+    let fallbackFontData = null;
+    if (fontData.name !== 'NotoSerifSC') {
+      try {
+        fallbackFontData = await loadFont('default');
+      } catch (e) {
+        console.error('Failed to load fallback font', e);
+      }
+    }
+
+    const getFontSize = (poemLength: number) => {
+      switch (poemLength) {
+        case 2: return 72;
+        case 4: return 64;
+        case 6: return 52;
+        default: return 64;
+      }
+    };
+
+    const getGapSize = (poemLength: number) => {
+      switch (poemLength) {
+        case 2: return '80px';
+        case 4: return '50px';
+        case 6: return '35px';
+        default: return '50px';
+      }
+    };
+
+    const fontSize = getFontSize(poem.length);
+    const gapSize = getGapSize(poem.length);
+
+    const sealText = name ? (name.length > 2 ? name.slice(-2) : name) : '印';
+    const isSealTwoChars = sealText.length > 1;
+
+    // Build poem elements
+    const poemElements = [
+      // Main poem content - vertical text
+      {
+        type: 'div',
+        props: {
+          style: {
+            display: 'flex',
+            flexDirection: 'row-reverse',
+            gap: gapSize,
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          },
+          children: poem.map((line: string, i: number) => ({
+            type: 'div',
+            key: `line-${i}`,
+            props: {
+              style: {
+                display: 'flex',
+                flexDirection: 'column',
+                fontSize: `${fontSize}px`,
+                lineHeight: '1.2',
+                color: '#1c1917',
+                fontFamily: fallbackFontData ? `${fontData.name}, ${fallbackFontData.name}` : fontData.name,
+              },
+              children: (line || '').split('').map((char: string, j: number) => ({
+                type: 'div',
+                key: `char-${j}`,
+                props: {
+                  children: char || ' ',
+                  style: { marginBottom: '15px' }
+                }
+              }))
+            }
+          }))
+        }
+      },
+      // Seal and year info
+      {
+        type: 'div',
+        props: {
+          style: {
+            position: 'absolute',
+            bottom: '60px',
+            left: '60px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px',
+          },
+          children: [
+            // Year text
+            {
+              type: 'div',
+              props: {
+                style: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  fontSize: '32px',
+                  color: '#57534e',
+                  fontFamily: fontData.name,
+                  opacity: 0.8,
+                },
+                children: ['乙', '巳', '年'].map((char: string, i: number) => ({
+                  type: 'div',
+                  key: `year-${i}`,
+                  props: {
+                    children: char,
+                    style: { marginBottom: '8px' }
+                  }
+                }))
+              }
+            },
+            // Seal
+            {
+              type: 'div',
+              props: {
+                style: {
+                  width: '80px',
+                  height: '80px',
+                  backgroundColor: '#b91c1c',
+                  color: 'white',
+                  display: 'flex',
+                  flexDirection: isSealTwoChars ? 'column' : 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: isSealTwoChars ? '36px' : '48px',
+                  borderRadius: '12px',
+                  fontFamily: fontData.name,
+                  border: '3px solid #991b1b',
+                  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.2)',
+                },
+                children: sealText.split('').map((char: string, i: number) => ({
+                  type: 'div',
+                  key: `seal-${i}`,
+                  props: {
+                    children: char,
+                    style: { lineHeight: '1' }
+                  }
+                }))
+              }
+            }
+          ]
+        }
+      }
+    ];
+
+    // Select mounting component based on frame
+    const renderFrame = (frameType: string, children: any[]) => {
+      const commonStyle = { display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' };
+
+      switch (frameType) {
+        case 'silk_scroll':
+          return SilkScroll({ children });
+        case 'redwood':
+          return Redwood({ children });
+        case 'golden_wood':
+          return GoldenWood({ children });
+        case 'cloud_brocade':
+          return CloudBrocade({ children });
+        case 'modern_black':
+          return ModernBlack({ children });
+        case 'sakura_pink':
+          return SakuraPink({ children });
+        case 'mint_green':
+          return MintGreen({ children });
+        case 'lavender_mist':
+          return LavenderMist({ children });
+        case 'champagne_gold':
+          return ChampagneGold({ children });
+        case 'azure_porcelain':
+          return AzurePorcelain({ children });
+        default:
+          return {
+            type: 'div',
+            props: {
+              style: { ...commonStyle, backgroundColor: '#f5f5f4', padding: '40px' },
+              children
+            }
+          };
+      }
+    };
+
     const svg = await satori(
-      Component({ poem, name, style, font: fontData.name }),
+      renderFrame(frame, poemElements) as any,
       {
         width: 800,
         height: 1200,
@@ -133,13 +298,22 @@ export default async function handler(req: Request) {
             weight: 400,
             style: 'normal',
           },
+          ...(fallbackFontData ? [{
+            name: fallbackFontData.name,
+            data: fallbackFontData.data,
+            weight: 400,
+            style: 'normal',
+          } as const] : []),
         ],
       }
     );
 
+    // Return SVG as base64 data URL for easy display
+    const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
+
     return new Response(JSON.stringify({
       success: true,
-      data: svg
+      data: base64Svg
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
