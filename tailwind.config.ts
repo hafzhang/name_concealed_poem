@@ -9,6 +9,9 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    // Add specific file globs to ensure nothing is missed
+    "./pages/**/*.tsx",
+    "./components/**/*.tsx",
   ],
   theme: {
     extend: {

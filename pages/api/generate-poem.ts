@@ -87,7 +87,17 @@ export default async function handler(req: NextRequest) {
 
     console.log(`生成藏头诗 - 名字: ${name}, 原始名字: ${originalName || name}, 行数: ${lineCount}, 格式: ${formatInstruction}`);
 
-    const client = getOpenAI();
+    let client;
+    try {
+      client = getOpenAI();
+    } catch (e: any) {
+      console.error('OpenAI Initialization Error:', e);
+      return new NextResponse(JSON.stringify({ success: false, error: `AI Client Init Failed: ${e.message}` }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const completion = await client.chat.completions.create({
       model: process.env.AI_MODEL_NAME || 'gpt-4',
       messages: [
@@ -139,6 +149,11 @@ export default async function handler(req: NextRequest) {
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
+    return res.status(500).json(
+      { success: false, error: error.message || 'Failed to generate poem' }
+    );
+  }
+}
     return res.status(500).json(
       { success: false, error: error.message || 'Failed to generate poem' }
     );

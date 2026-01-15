@@ -5,18 +5,13 @@
 :root {
   color-scheme: light; /* Force browser to use light mode styles for inputs/scrollbars */
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 255, 255, 255; /* Changed from 214, 219, 220 to white */
   --background-end-rgb: 255, 255, 255;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: transparent; /* Changed from linear-gradient to transparent, let Tailwind control bg */
 }
 
 @layer utilities {

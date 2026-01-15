@@ -99,7 +99,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 text-red-900">
       {/* 装饰背景 */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute top-0 left-0 w-96 h-96 bg-red-800 rounded-full filter blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
