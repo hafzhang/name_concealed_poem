@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 export const config = {
   runtime: 'edge',
@@ -13,23 +13,16 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    const body = await req.json();
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = body;
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
 
     if (!name || name.length < 2) {
-      return new NextResponse(JSON.stringify({ success: false, error: '名字至少需要2个字符' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return res.status(400).json({ success: false, error: '名字至少需要2个字符' });
     }
 
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
@@ -97,52 +90,46 @@ export default async function handler(req: NextRequest) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI API error:', response.status, errorText);
-      return new NextResponse(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: `AI API error: ${response.status} ${response.statusText}`
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const data = await response.json();
-    
-    let content = data.choices[0]?.message?.content || '';
+    let content = data.choices?.[0]?.message?.content || '';
     // Clean up content if it contains markdown code blocks
     content = content.replace(/```json\n?|\n?```/g, '').trim();
-    
+
     let result;
     try {
       result = JSON.parse(content);
     } catch (e) {
       console.error('Failed to parse AI response:', content);
-      return new NextResponse(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: 'Failed to parse AI response',
         raw: content
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    return new NextResponse(JSON.stringify({
+    return res.json({
       success: true,
-      data: result
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      data: {
+        poem: result.poem,
+        explanation: result.explanation,
+        originalName: originalName || name,
+        processedName: name,
+        lineCount,
+        cached: false
+      }
     });
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
-    return new NextResponse(JSON.stringify({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Failed to generate poem'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
     });
   }
 }

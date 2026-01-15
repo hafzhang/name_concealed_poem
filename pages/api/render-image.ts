@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import satori from 'satori';
 
 export const config = {
@@ -86,23 +86,16 @@ import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
 import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    const body = await req.json();
-    const { poem, style, bg, frame, name, lineCount = 4 } = body;
+    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return new NextResponse(JSON.stringify({ success: false, error: 'Invalid poem data' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return res.status(400).json({ success: false, error: 'Invalid poem data' });
     }
 
     // Select component based on background
@@ -128,7 +121,7 @@ export default async function handler(req: NextRequest) {
       Component({ poem, name, style, font: fontData.name }),
       {
         width: 800,
-        height: 1200, // Approximate height, satori handles layout
+        height: 1200,
         fonts: [
           {
             name: fontData.name,
@@ -140,26 +133,16 @@ export default async function handler(req: NextRequest) {
       }
     );
 
-    // Return SVG directly or convert to PNG?
-    // Returning SVG for now as it's lighter and can be rendered by browser
-    // Or we can return base64. Let's return JSON with SVG string.
-
-    return new NextResponse(JSON.stringify({
+    return res.json({
       success: true,
       data: svg
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
     console.error('Error rendering image:', error);
-    return new NextResponse(JSON.stringify({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Failed to render image'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
