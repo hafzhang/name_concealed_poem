@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import OpenAI from 'openai';
 
 export const config = {
@@ -9,11 +9,10 @@ const getOpenAI = () => {
   return new OpenAI({
     apiKey: process.env.AI_API_KEY || process.env.API_KEY || '',
     baseURL: process.env.AI_BASE_URL || undefined,
-    timeout: parseInt(process.env.AI_TIMEOUT || '60000', 10), // 默认 60 秒
+    timeout: parseInt(process.env.AI_TIMEOUT || '60000', 10),
   });
 };
 
-// Map font styles to literary styles for better poem generation
 const styleMap: Record<string, string> = {
   'kaishu': '端正平实',
   'xingshu': '飘逸洒脱',
@@ -23,35 +22,20 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export default async function handler(req: NextRequest) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    // 接收参数：name 是前端已处理过的名字，与 lineCount 匹配
-    const body = await req.json();
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = body;
-
-    // 注意：name 是前端已经处理过的名字
-    // - lineCount=2 时，name 长度一定是 2
-    // - lineCount=4 时，name 长度可能是 2-4
-    // - lineCount=6 时，name 长度可能是 2-4
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
 
     if (!name || name.length < 2) {
-      return new NextResponse(JSON.stringify({ success: false, error: '名字至少需要2个字符' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return res.status(400).json({ success: false, error: '名字至少需要2个字符' });
     }
 
-    // Determine literary style
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
 
-    // 根据行数动态构建 Prompt
     let formatInstruction = "五言绝句";
     let acrosticInstruction = "必须是藏头诗，共四句。每句的第一个字依次是";
     let poemCount = 4;
@@ -65,9 +49,7 @@ export default async function handler(req: NextRequest) {
       acrosticInstruction = "前三句必须是藏头，第1-3句的第一个字依次是";
       poemCount = 6;
     }
-    // lineCount === 4 时使用默认值
 
-    // 构建诗句数组模板
     const poemTemplate = Array.from({ length: poemCount }, (_, i) => `第${i + 1}句`);
 
     const prompt = `你是一个国学大师。请为"${name}"创作一首${formatInstruction}。
@@ -87,17 +69,7 @@ export default async function handler(req: NextRequest) {
 
     console.log(`生成藏头诗 - 名字: ${name}, 原始名字: ${originalName || name}, 行数: ${lineCount}, 格式: ${formatInstruction}`);
 
-    let client;
-    try {
-      client = getOpenAI();
-    } catch (e: any) {
-      console.error('OpenAI Initialization Error:', e);
-      return new NextResponse(JSON.stringify({ success: false, error: `AI Client Init Failed: ${e.message}` }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
+    const client = getOpenAI();
     const completion = await client.chat.completions.create({
       model: process.env.AI_MODEL_NAME || 'gpt-4',
       messages: [
@@ -105,7 +77,7 @@ export default async function handler(req: NextRequest) {
         { role: 'user', content: prompt }
       ],
       temperature: 0.7,
-      stream: false, // Ensure we get the full JSON at once
+      stream: false,
     });
 
     const content = completion.choices[0].message.content;
@@ -114,9 +86,6 @@ export default async function handler(req: NextRequest) {
       throw new Error('No content received from AI');
     }
 
-    console.log('AI Response:', content); // For debugging
-
-    // Parse JSON safely (handling potential markdown wrappers)
     let jsonStr = content.trim();
     if (jsonStr.startsWith('```json')) {
       jsonStr = jsonStr.replace(/^```json\s*/, '').replace(/\s*```$/, '');
@@ -128,11 +97,7 @@ export default async function handler(req: NextRequest) {
     try {
       result = JSON.parse(jsonStr);
     } catch (e) {
-      console.error('JSON Parse Error:', e);
-      // Fallback if JSON parsing fails
-      return res.status(500).json(
-        { success: false, error: 'Failed to parse AI response' }
-      );
+      return res.status(500).json({ success: false, error: 'Failed to parse AI response' });
     }
 
     return res.json({
@@ -140,8 +105,8 @@ export default async function handler(req: NextRequest) {
       data: {
         poem: result.poem,
         explanation: result.explanation,
-        originalName: originalName || name,  // 返回原始名字用于显示
-        processedName: name,                 // 返回处理后的名字
+        originalName: originalName || name,
+        processedName: name,
         lineCount,
         cached: false
       }
@@ -149,13 +114,6 @@ export default async function handler(req: NextRequest) {
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
-    return res.status(500).json(
-      { success: false, error: error.message || 'Failed to generate poem' }
-    );
-  }
-}
-    return res.status(500).json(
-      { success: false, error: error.message || 'Failed to generate poem' }
-    );
+    return res.status(500).json({ success: false, error: error.message || 'Failed to generate poem' });
   }
 }
