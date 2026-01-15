@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import satori from 'satori';
 
 export const config = {
@@ -62,6 +62,7 @@ const loadFont = async (style: string) => {
     const arrayBuffer = await response.arrayBuffer();
     return { name: fontName, data: arrayBuffer };
   } catch (e) {
+    console.error('Font loading error:', e);
     try {
       const fallbackUrl = `${baseUrl}/fonts/NotoSerifSC.woff`;
       const response = await fetch(fallbackUrl);
@@ -85,235 +86,80 @@ import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
 import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Set JSON header first
-  res.setHeader('Content-Type', 'application/json');
-
+export default async function handler(req: NextRequest) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
+    const body = await req.json();
+    const { poem, style, bg, frame, name, lineCount = 4 } = body;
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return res.status(400).json({ success: false, error: 'Invalid poem data' });
+      return new NextResponse(JSON.stringify({ success: false, error: 'Invalid poem data' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    const fontInfo = await loadFont(style);
-    const sealText = name ? (name.length > 2 ? name.slice(-2) : name) : '印';
-    const isSealTwoChars = sealText.length > 1;
-    const poemLength = poem.length;
-
-    const getFontSize = (lineCount: number) => {
-      switch (lineCount) {
-        case 2: return 72;
-        case 4: return 64;
-        case 6: return 52;
-        default: return 64;
-      }
-    };
-
-    const fontSize = getFontSize(poemLength);
-
-    const getGapSize = (lineCount: number) => {
-      switch (lineCount) {
-        case 2: return '80px';
-        case 4: return '50px';
-        case 6: return '35px';
-        default: return '50px';
-      }
-    };
-
-    const gapSize = getGapSize(poemLength);
-
-    let fallbackFontInfo = null;
-    if (fontInfo.name !== 'NotoSerifSC') {
-      try {
-        fallbackFontInfo = await loadFont('default');
-      } catch (e) {
-        console.error('Failed to load fallback font', e);
-      }
+    // Select component based on background
+    let Component;
+    switch (bg) {
+      case 'silk_scroll': Component = SilkScroll; break;
+      case 'redwood': Component = Redwood; break;
+      case 'golden_wood': Component = GoldenWood; break;
+      case 'cloud_brocade': Component = CloudBrocade; break;
+      case 'modern_black': Component = ModernBlack; break;
+      case 'sakura_pink': Component = SakuraPink; break;
+      case 'mint_green': Component = MintGreen; break;
+      case 'lavender_mist': Component = LavenderMist; break;
+      case 'champagne_gold': Component = ChampagneGold; break;
+      case 'azure_porcelain': Component = AzurePorcelain; break;
+      default: Component = SilkScroll;
     }
 
-    const renderFrame = (frameType: string, children: any[]) => {
-      const commonStyle = { display: 'flex', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', position: 'relative' };
-
-      switch (frameType) {
-        case 'silk_scroll':
-          return SilkScroll({ children });
-        case 'redwood':
-          return Redwood({ children });
-        case 'golden_wood':
-          return GoldenWood({ children });
-        case 'cloud_brocade':
-          return CloudBrocade({ children });
-        case 'modern_black':
-          return ModernBlack({ children });
-        case 'sakura_pink':
-          return SakuraPink({ children });
-        case 'mint_green':
-          return MintGreen({ children });
-        case 'lavender_mist':
-          return LavenderMist({ children });
-        case 'champagne_gold':
-          return ChampagneGold({ children });
-        case 'azure_porcelain':
-          return AzurePorcelain({ children });
-        default:
-          return {
-            type: 'div',
-            props: {
-              style: { ...commonStyle, backgroundColor: '#f5f5f4', padding: '40px' },
-              children
-            }
-          };
-      }
-    };
-
-    const poemElements = [
-      {
-        type: 'div',
-        props: {
-          style: {
-            display: 'flex',
-            flexDirection: 'row-reverse',
-            gap: gapSize,
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-          },
-          children: poem.map((line: string, i: number) => ({
-            type: 'div',
-            key: `line-${i}`,
-            props: {
-              style: {
-                display: 'flex',
-                flexDirection: 'column',
-                fontSize: `${fontSize}px`,
-                lineHeight: '1.2',
-                color: '#1c1917',
-                fontFamily: fallbackFontInfo ? `${fontInfo.name}, ${fallbackFontInfo.name}` : fontInfo.name,
-              },
-              children: (line || '').split('').map((char, j) => ({
-                type: 'div',
-                key: `char-${j}`,
-                props: {
-                  children: char || ' ',
-                  style: { marginBottom: '15px' }
-                }
-              }))
-            }
-          }))
-        }
-      },
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            bottom: '60px',
-            left: '60px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '15px',
-          },
-          children: [
-            {
-              type: 'div',
-              props: {
-                style: {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  fontSize: '32px',
-                  color: '#57534e',
-                  fontFamily: fontInfo.name,
-                  opacity: 0.8,
-                },
-                children: ['乙', '巳', '年'].map((char, i) => ({
-                  type: 'div',
-                  key: `year-${i}`,
-                  props: {
-                    children: char,
-                    style: { marginBottom: '8px' }
-                  }
-                }))
-              }
-            },
-            {
-              type: 'div',
-              props: {
-                style: {
-                  width: '80px',
-                  height: '80px',
-                  backgroundColor: '#b91c1c',
-                  color: 'white',
-                  display: 'flex',
-                  flexDirection: isSealTwoChars ? 'column' : 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: isSealTwoChars ? '36px' : '48px',
-                  borderRadius: '12px',
-                  fontFamily: fontInfo.name,
-                  border: '3px solid #991b1b',
-                  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.2)',
-                  gap: isSealTwoChars ? '0px' : '0',
-                },
-                children: sealText.split('').map((char: string, i: number) => ({
-                  type: 'div',
-                  key: `seal-${i}`,
-                  props: {
-                    children: char,
-                    style: { lineHeight: '1' }
-                  }
-                }))
-              }
-            }
-          ]
-        }
-      }
-    ];
+    const fontData = await loadFont(style);
 
     const svg = await satori(
-      renderFrame(frame, poemElements) as any,
+      // @ts-ignore
+      Component({ poem, name, style, font: fontData.name }),
       {
         width: 800,
-        height: 1200,
+        height: 1200, // Approximate height, satori handles layout
         fonts: [
           {
-            name: fontInfo.name,
-            data: fontInfo.data,
+            name: fontData.name,
+            data: fontData.data,
             weight: 400,
             style: 'normal',
           },
-          ...(fallbackFontInfo ? [{
-            name: fallbackFontInfo.name,
-            data: fallbackFontInfo.data,
-            weight: 400,
-            style: 'normal',
-          } as const] : []),
         ],
       }
     );
 
-    const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
+    // Return SVG directly or convert to PNG?
+    // Returning SVG for now as it's lighter and can be rendered by browser
+    // Or we can return base64. Let's return JSON with SVG string.
 
-    return res.json({
+    return new NextResponse(JSON.stringify({
       success: true,
-      data: {
-        imageUrl: base64Svg,
-        format: 'svg',
-        remainingCredits: 2
-      }
+      data: svg
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error rendering image:', error);
-    return res.status(500).json({
+    return new NextResponse(JSON.stringify({
       success: false,
-      error: `Failed to render image: ${error instanceof Error ? error.message : String(error)}`
+      error: error.message || 'Failed to render image'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
