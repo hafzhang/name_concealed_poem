@@ -16,60 +16,79 @@ const loadFont = async (style: string) => {
 
   switch (style) {
     case 'kaishu':
-      fontUrl = `${baseUrl}/fonts/kaishu.ttf`;
+      fontUrl = `${baseUrl}/public/fonts/kaishu.ttf`;
       fontName = 'KaiShu';
       break;
     case 'xingshu':
-      fontUrl = `${baseUrl}/fonts/zhi-mang-xing.woff`;
+      fontUrl = `${baseUrl}/public/fonts/zhi-mang-xing.woff`;
       fontName = 'ZhiMangXing';
       break;
     case 'caoshu':
-      fontUrl = `${baseUrl}/fonts/liu-jian-mao-cao.woff`;
+      fontUrl = `${baseUrl}/public/fonts/liu-jian-mao-cao.woff`;
       fontName = 'LiuJianMaoCao';
       break;
     case 'lishu':
-      fontUrl = `${baseUrl}/fonts/qingliaolishu.ttf`;
+      fontUrl = `${baseUrl}/public/fonts/qingliaolishu.ttf`;
       fontName = 'QingLiaoLiShu';
       break;
     case 'shoujin':
-      fontUrl = `${baseUrl}/fonts/ShouJin.ttf`;
+      fontUrl = `${baseUrl}/public/fonts/ShouJin.ttf`;
       fontName = 'ShouJin';
       break;
     case 'niaochong':
-      fontUrl = `${baseUrl}/fonts/zcool-xiaowei.woff`;
+      fontUrl = `${baseUrl}/public/fonts/zcool-xiaowei.woff`;
       fontName = 'ZcoolXiaoWei';
       break;
     case 'mianhua':
-      fontUrl = `${baseUrl}/fonts/mianhuatang.woff2`;
+      fontUrl = `${baseUrl}/public/fonts/mianhuatang.woff2`;
       fontName = 'mianhuatang';
       break;
     case 'marker':
-      fontUrl = `${baseUrl}/fonts/lxgw-marker-gothic.woff`;
+      fontUrl = `${baseUrl}/public/fonts/lxgw-marker-gothic.woff`;
       fontName = 'LXGWMarkerGothic';
       break;
     default:
-      fontUrl = `${baseUrl}/fonts/NotoSerifSC.woff`;
+      fontUrl = `${baseUrl}/public/fonts/NotoSerifSC.woff`;
       fontName = 'NotoSerifSC';
       break;
   }
 
   try {
+    console.log(`Loading font: ${fontUrl}`);
     const response = await fetch(fontUrl);
     if (!response.ok) {
-      throw new Error(`Failed to fetch font: ${response.status}`);
+      throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
     }
     const arrayBuffer = await response.arrayBuffer();
+
+    // Validate ArrayBuffer has content
+    if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+      throw new Error(`Font file is empty: ${fontUrl}`);
+    }
+
+    console.log(`Font loaded successfully: ${fontName}, size: ${arrayBuffer.byteLength} bytes`);
     return { name: fontName, data: arrayBuffer };
   } catch (e) {
     console.error('Font loading error:', e);
+    // Try fallback path without /public
+    const fallbackBaseUrl = baseUrl.replace('/public', '');
+    const fallbackFontUrl = fontUrl.replace('/public', '');
+
     try {
-      const fallbackUrl = `${baseUrl}/fonts/NotoSerifSC.woff`;
-      const response = await fetch(fallbackUrl);
+      console.log(`Trying fallback font: ${fallbackFontUrl}`);
+      const response = await fetch(fallbackFontUrl);
       if (!response.ok) throw new Error(`Failed to fetch fallback font`);
       const arrayBuffer = await response.arrayBuffer();
+
+      if (!arrayBuffer || arrayBuffer.byteLength === 0) {
+        throw new Error(`Fallback font file is empty`);
+      }
+
+      console.log(`Fallback font loaded: NotoSerifSC, size: ${arrayBuffer.byteLength} bytes`);
       return { name: 'NotoSerifSC', data: arrayBuffer };
-    } catch {
-      throw new Error(`Font file not found`);
+    } catch (fallbackError) {
+      console.error('Fallback font loading error:', fallbackError);
+      throw new Error(`Font file not found or invalid: ${e.message}`);
     }
   }
 };
@@ -105,6 +124,7 @@ export default async function handler(req: Request) {
     }
 
     // Load font
+    console.log(`Starting image render with style: ${style}, frame: ${frame}`);
     const fontData = await loadFont(style);
 
     // Load fallback font
@@ -286,6 +306,7 @@ export default async function handler(req: Request) {
       }
     };
 
+    console.log('Rendering SVG with satori...');
     const svg = await satori(
       renderFrame(frame, poemElements) as any,
       {
@@ -307,6 +328,7 @@ export default async function handler(req: Request) {
         ],
       }
     );
+    console.log('SVG rendered successfully, length:', svg.length);
 
     // Return SVG as base64 data URL for easy display
     const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
@@ -323,7 +345,8 @@ export default async function handler(req: Request) {
     console.error('Error rendering image:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Failed to render image'
+      error: error.message || 'Failed to render image',
+      details: error.toString()
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
