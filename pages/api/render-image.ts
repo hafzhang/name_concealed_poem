@@ -93,18 +93,23 @@ import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
 import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextRequest) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
+    const body = await req.json();
+    const { poem, style, bg, frame, name, lineCount = 4 } = body;
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return res.status(400).json(
-        { success: false, error: 'Invalid poem data' }
-      );
+      return new NextResponse(JSON.stringify({ success: false, error: 'Invalid poem data' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const fontInfo = await loadFont(style);
@@ -326,19 +331,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Client can convert to PNG if needed using canvas or other libraries
     const base64Svg = `data:image/svg+xml;base64,${btoa(svg)}`;
 
-    return res.json({
+    return new NextResponse(JSON.stringify({
       success: true,
       data: {
         imageUrl: base64Svg,
         format: 'svg',
         remainingCredits: 2
       }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
     console.error('Error rendering image:', error);
-    return res.status(500).json(
-      { success: false, error: `Failed to render image: ${error instanceof Error ? error.message : String(error)}`, stack: error instanceof Error ? error.stack : undefined }
-    );
+    return new NextResponse(JSON.stringify({
+      success: false,
+      error: `Failed to render image: ${error instanceof Error ? error.message : String(error)}`,
+      stack: error instanceof Error ? error.stack : undefined
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }

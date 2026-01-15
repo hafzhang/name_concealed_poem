@@ -53,12 +53,12 @@ export default function Home() {
         setPoemData(data.data);
         setStep('review');
       } else {
-        alert(data.error);
+        alert(`生成失败: ${data.error}`);
         setStep('input');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('生成失败，请重试');
+      alert(`生成失败，请重试。错误详情: ${e.message || '未知错误'}`);
       setStep('input');
     }
   };
@@ -88,12 +88,12 @@ export default function Home() {
         setImageUrl(data.data.imageUrl);
         setStep('result');
       } else {
-        alert(data.error);
+        alert(`生成图片失败: ${data.error}`);
         setStep('review');
       }
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('生成图片失败');
+      alert(`生成图片失败。错误详情: ${e.message || '未知错误'}`);
       setStep('review');
     }
   };

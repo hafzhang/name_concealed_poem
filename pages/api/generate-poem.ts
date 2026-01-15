@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
 export const config = {
@@ -23,14 +23,18 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextRequest) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return new NextResponse(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
     // 接收参数：name 是前端已处理过的名字，与 lineCount 匹配
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
+    const body = await req.json();
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = body;
 
     // 注意：name 是前端已经处理过的名字
     // - lineCount=2 时，name 长度一定是 2
@@ -38,9 +42,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // - lineCount=6 时，name 长度可能是 2-4
 
     if (!name || name.length < 2) {
-      return res.status(400).json(
-        { success: false, error: '名字至少需要2个字符' }
-      );
+      return new NextResponse(JSON.stringify({ success: false, error: '名字至少需要2个字符' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     // Determine literary style
