@@ -66,7 +66,7 @@ export default function Home() {
   const handleRenderImage = async () => {
     if (!poemData) return;
     setStep('generating_image');
-
+    // Request image generation
     try {
       const res = await fetch('/api/render-image', {
         method: 'POST',
