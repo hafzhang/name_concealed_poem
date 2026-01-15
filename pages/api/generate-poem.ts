@@ -1,9 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-
-export const config = {
-  runtime: 'edge',
-};
-
 const styleMap: Record<string, string> = {
   'kaishu': '端正平实',
   'xingshu': '飘逸洒脱',
@@ -13,16 +7,27 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export const config = {
+  runtime: 'edge',
+};
+
+export default async function handler(req: Request) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return new Response(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
+    const body = await req.json();
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = body;
 
     if (!name || name.length < 2) {
-      return res.status(400).json({ success: false, error: '名字至少需要2个字符' });
+      return new Response(JSON.stringify({ success: false, error: '名字至少需要2个字符' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
@@ -63,7 +68,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const modelName = process.env.AI_MODEL_NAME || 'gpt-4';
     const timeout = parseInt(process.env.AI_TIMEOUT || '60000', 10);
 
-    // Use native fetch for edge runtime compatibility
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -90,15 +94,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI API error:', response.status, errorText);
-      return res.status(500).json({
+      return new Response(JSON.stringify({
         success: false,
         error: `AI API error: ${response.status} ${response.statusText}`
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const data = await response.json();
     let content = data.choices?.[0]?.message?.content || '';
-    // Clean up content if it contains markdown code blocks
     content = content.replace(/```json\n?|\n?```/g, '').trim();
 
     let result;
@@ -106,14 +112,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       result = JSON.parse(content);
     } catch (e) {
       console.error('Failed to parse AI response:', content);
-      return res.status(500).json({
+      return new Response(JSON.stringify({
         success: false,
         error: 'Failed to parse AI response',
         raw: content
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    return res.json({
+    return new Response(JSON.stringify({
       success: true,
       data: {
         poem: result.poem,
@@ -123,13 +132,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         lineCount,
         cached: false
       }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
-    return res.status(500).json({
+    return new Response(JSON.stringify({
       success: false,
       error: error.message || 'Failed to generate poem'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }

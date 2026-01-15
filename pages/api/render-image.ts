@@ -1,4 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import satori from 'satori';
 
 export const config = {
@@ -86,19 +85,25 @@ import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
 import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: Request) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, error: 'Method not allowed' });
+    return new Response(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
-    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
+    const body = await req.json();
+    const { poem, style, bg, frame, name, lineCount = 4 } = body;
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return res.status(400).json({ success: false, error: 'Invalid poem data' });
+      return new Response(JSON.stringify({ success: false, error: 'Invalid poem data' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    // Select component based on background
     let Component;
     switch (bg) {
       case 'silk_scroll': Component = SilkScroll; break;
@@ -117,7 +122,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const fontData = await loadFont(style);
 
     const svg = await satori(
-      // @ts-ignore
       Component({ poem, name, style, font: fontData.name }),
       {
         width: 800,
@@ -133,16 +137,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     );
 
-    return res.json({
+    return new Response(JSON.stringify({
       success: true,
       data: svg
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
     console.error('Error rendering image:', error);
-    return res.status(500).json({
+    return new Response(JSON.stringify({
       success: false,
       error: error.message || 'Failed to render image'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
