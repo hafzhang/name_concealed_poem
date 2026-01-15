@@ -64,26 +64,50 @@ export default async function handler(req: Request) {
     const modelName = process.env.AI_MODEL_NAME || 'gpt-4';
     const timeout = parseInt(process.env.AI_TIMEOUT || '60000', 10);
 
+    // Check if API key is configured
+    if (!apiKey) {
+      console.error('AI_API_KEY or API_KEY environment variable is not set');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'AI service not configured. Please set AI_API_KEY environment variable.'
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const response = await fetch(`${baseURL}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: modelName,
-        messages: [
-          { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
+    let response;
+    try {
+      response = await fetch(`${baseURL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [
+            { role: 'system', content: '你是一个帮助生成JSON数据的AI助手。' },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.7,
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } catch (fetchError: any) {
+      console.error('Fetch error:', fetchError);
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Failed to connect to AI service: ${fetchError.message || 'Unknown error'}`
+      }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     clearTimeout(timeoutId);
 
@@ -137,7 +161,8 @@ export default async function handler(req: Request) {
     console.error('Error generating poem:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message || 'Failed to generate poem'
+      error: error.message || 'Failed to generate poem',
+      details: error.toString()
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
