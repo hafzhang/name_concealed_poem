@@ -212,7 +212,7 @@ export const API_ENDPOINTS = {
  */
 export const API_DEFAULTS = {
   /** 请求超时时间（毫秒） */
-  TIMEOUT: 60000,
+  TIMEOUT: 120000,
   /** 重试次数 */
   RETRIES: 3,
   /** 重试延迟（毫秒） */

@@ -111,7 +111,7 @@ const DEFAULT_LINE_COUNTS: LineCount[] = [
 ];
 
 const DEFAULT_API_CONFIG: ApiConfig = {
-  timeout: 60000,
+  timeout: 120000,
   retries: 3,
   retryDelay: 1000,
   rateLimit: {

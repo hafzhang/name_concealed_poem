@@ -73,7 +73,7 @@ export function getAIConfig() {
     apiKey: env.AI_API_KEY,
     baseURL: env.AI_BASE_URL,
     modelName: env.AI_MODEL_NAME,
-    timeout: 60000, // 默认 60 秒
+    timeout: 120000, // 默认 120 秒
   };
 }
 

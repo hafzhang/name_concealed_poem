@@ -61,36 +61,6 @@ const RATE_LIMIT_CONFIG = {
   windowMs: 60 * 1000, // 1分钟
 };
 
-// 限流状态
-const rateLimitState = {
-  requests: [] as number[],
-  isLimited: false,
-};
-
-/**
- * 检查是否被限流
- */
-function checkRateLimit(): boolean {
-  const now = Date.now();
-
-  // 清除过期的请求记录
-  rateLimitState.requests = rateLimitState.requests.filter(
-    (time) => now - time < RATE_LIMIT_CONFIG.windowMs
-  );
-
-  // 检查是否超过限制
-  if (rateLimitState.requests.length >= RATE_LIMIT_CONFIG.maxRequests) {
-    rateLimitState.isLimited = true;
-    setTimeout(() => {
-      rateLimitState.isLimited = false;
-    }, RATE_LIMIT_CONFIG.windowMs);
-    return true;
-  }
-
-  rateLimitState.requests.push(now);
-  return false;
-}
-
 /**
  * 延迟函数
  */
@@ -105,6 +75,28 @@ export const useApiRequest = (): UseApiRequestReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const rateLimitRequestsRef = useRef<number[]>([]);
+  const rateLimitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const checkRateLimit = useCallback((): boolean => {
+    const now = Date.now();
+
+    rateLimitRequestsRef.current = rateLimitRequestsRef.current.filter(
+      (time) => now - time < RATE_LIMIT_CONFIG.windowMs
+    );
+
+    if (rateLimitRequestsRef.current.length >= RATE_LIMIT_CONFIG.maxRequests) {
+      if (!rateLimitTimerRef.current) {
+        rateLimitTimerRef.current = setTimeout(() => {
+          rateLimitTimerRef.current = null;
+        }, RATE_LIMIT_CONFIG.windowMs);
+      }
+      return true;
+    }
+
+    rateLimitRequestsRef.current.push(now);
+    return false;
+  }, []);
 
   /**
    * 清除错误
@@ -122,7 +114,7 @@ export const useApiRequest = (): UseApiRequestReturn => {
       options: RequestInit,
       retryOptions: RequestOptions
     ): Promise<Response> => {
-      const { retries = 0, retryDelay = 1000, timeout = 30000 } = retryOptions;
+      const { retries = 3, retryDelay = 1000, timeout = 120000 } = retryOptions;
 
       let lastError: Error | null = null;
 

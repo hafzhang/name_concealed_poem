@@ -684,12 +684,12 @@ describe('边界情况 - 异常处理', () => {
   test('包含空格的名字正常处理', () => {
     const { result } = renderHook(() => usePoemGenerator());
     const processed = result.current.getProcessedName('李 小 明', 2);
-    expect(processed).toBe(' 小'); // slice(-2) 包含空格
+    expect(processed).toBe(' 明');
   });
 
   test('特殊字符名字正常处理', () => {
     const { result } = renderHook(() => usePoemGenerator());
     const processed = result.current.getProcessedName('李@小明', 2);
-    expect(processed).toBe('@小明');
+    expect(processed).toBe('小明');
   });
 });

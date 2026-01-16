@@ -221,8 +221,9 @@ describe('useApiRequest - API 请求 Hook', () => {
       const { result } = renderHook(() => useApiRequest());
 
       // 开始请求
-      const requestPromise = act(async () => {
-        await result.current.generatePoem({
+      let requestPromise: Promise<any>;
+      act(() => {
+        requestPromise = result.current.generatePoem({
           name: '张三',
           originalName: '张三',
           style: 'kaishu',
@@ -237,7 +238,7 @@ describe('useApiRequest - API 请求 Hook', () => {
       // 完成请求
       await act(async () => {
         resolveFetch!(mockSuccessResponse({ success: true, data: {} }));
-        await requestPromise;
+        await requestPromise!;
       });
 
       expect(result.current.loading).toBe(false);
@@ -288,7 +289,10 @@ describe('useApiRequest - API 请求 Hook', () => {
           })
         );
 
-      const responses = await Promise.all(requests);
+      let responses: any[] = [];
+      await act(async () => {
+        responses = await Promise.all(requests);
+      });
 
       // 至少有一个请求应该被限流
       const rateLimited = responses.some(
@@ -301,7 +305,7 @@ describe('useApiRequest - API 请求 Hook', () => {
       let callCount = 0;
       (global.fetch as jest.Mock).mockImplementation(() => {
         callCount++;
-        if (callCount <= 3) {
+        if (callCount <= 1) {
           return Promise.resolve(mockErrorResponse(429, '请求过于频繁'));
         }
         return Promise.resolve(
@@ -312,14 +316,15 @@ describe('useApiRequest - API 请求 Hook', () => {
       const { result } = renderHook(() => useApiRequest());
 
       // 第一次请求被限流
-      const response1 = await act(async () => {
-        return await result.current.generatePoem({
+      let response1: any;
+      await act(async () => {
+        response1 = await result.current.generatePoem({
           name: '张三',
           originalName: '张三',
           style: 'kaishu',
           styleKeyword: '',
           lineCount: 4,
-        });
+        }, { retries: 0 });
       });
 
       expect(response1.success).toBe(false);
@@ -327,14 +332,15 @@ describe('useApiRequest - API 请求 Hook', () => {
       // 等待后再次请求
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const response2 = await act(async () => {
-        return await result.current.generatePoem({
+      let response2: any;
+      await act(async () => {
+        response2 = await result.current.generatePoem({
           name: '张三',
           originalName: '张三',
           style: 'kaishu',
           styleKeyword: '',
           lineCount: 4,
-        });
+        }, { retries: 0 });
       });
 
       // 最终应该成功

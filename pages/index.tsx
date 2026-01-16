@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useGuestId } from '@/lib/hooks/useGuestId';
 import { usePoemGenerator } from '@/hooks/usePoemGenerator';
 import { Loader2, Send, Download, RefreshCw, ArrowLeft, ChevronDown, ChevronUp, PenLine } from 'lucide-react';
@@ -24,6 +24,20 @@ export default function Home() {
   const [frame, setFrame] = useState('none');
   const [poemData, setPoemData] = useState<PoemData | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const generatePoemAbortRef = useRef<AbortController | null>(null);
+
+  // Cleanup blob URL when changing steps or unmounting
+  useEffect(() => {
+    return () => {
+      if (generatePoemAbortRef.current) {
+        generatePoemAbortRef.current.abort();
+        generatePoemAbortRef.current = null;
+      }
+      if (imageUrl && imageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
+  }, [imageUrl]);
 
   const {
     lineCount,
@@ -42,10 +56,15 @@ export default function Home() {
     const params = generateRequestParams(name, style);
 
     try {
+      if (generatePoemAbortRef.current) {
+        generatePoemAbortRef.current.abort();
+      }
+      generatePoemAbortRef.current = new AbortController();
       const res = await fetch('/api/generate-poem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
+        body: JSON.stringify(params),
+        signal: generatePoemAbortRef.current.signal,
       });
       const data = await res.json();
 
@@ -57,9 +76,14 @@ export default function Home() {
         setStep('input');
       }
     } catch (e: any) {
+      if (e?.name === 'AbortError') {
+        return;
+      }
       console.error(e);
       alert(`生成失败，请重试。错误详情: ${e.message || '未知错误'}`);
       setStep('input');
+    } finally {
+      generatePoemAbortRef.current = null;
     }
   };
 
@@ -79,21 +103,40 @@ export default function Home() {
           style,
           bg: 'rice_paper',
           frame,
-          name
+          name,
+          lineCount: poemData.lineCount || 4
         })
       });
-      const data = await res.json();
 
-      if (data.success) {
-        setImageUrl(data.data.imageUrl);
-        setStep('result');
-      } else {
-        alert(`生成图片失败: ${data.error}`);
+      // Check if response is ok
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Server response error:', res.status, errorText);
+        alert(`服务器错误 (${res.status}): ${errorText || '未知错误'}`);
         setStep('review');
+        return;
       }
+
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.startsWith('image/')) {
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
+        setStep('result');
+        return;
+      }
+
+      const text = await res.text();
+      try {
+        const data = JSON.parse(text);
+        alert(`生成图片失败: ${data.error || '未知错误'}`);
+      } catch {
+        alert(`生成图片失败: 服务器返回了意外的响应格式`);
+      }
+      setStep('review');
     } catch (e: any) {
-      console.error(e);
-      alert(`生成图片失败。错误详情: ${e.message || '未知错误'}`);
+      console.error('Fetch error:', e);
+      alert(`生成图片失败。错误详情: ${e.message || '未知错误'}\n请检查服务器是否正常运行`);
       setStep('review');
     }
   };
@@ -332,7 +375,7 @@ export default function Home() {
         {step === 'result' && imageUrl && (
           <div className="space-y-6">
             <div className="relative aspect-[2/3] w-full bg-white rounded-2xl overflow-hidden shadow-2xl border-4 border-amber-200">
-              <img src={imageUrl} alt="Generated Poem" className="w-full h-full object-cover" />
+              <img src={imageUrl} alt="Generated Poem" className="w-full h-full object-contain" />
             </div>
 
             <div className="flex flex-col gap-3">

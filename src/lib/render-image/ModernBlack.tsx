@@ -17,106 +17,83 @@ const COLORS = {
 };
 
 export const ModernBlack = ({ children }: MountingProps) => {
-  return {
-    type: 'div',
-    props: {
-      style: {
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        backgroundColor: COLORS.frameBlack,
-        position: 'relative',
-        padding: '25px',
-      },
-      children: [
-        // 内容区
-        {
-          type: 'div',
-          props: {
-            style: {
-              flex: 1,
-              backgroundColor: COLORS.paperBg,
-              margin: '25px',
-              padding: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-              position: 'relative',
-            },
-            children: [
-              // 内边框（灰色细线）
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    inset: '15px',
-                    border: '1px solid #e5e5e5',
-                    opacity: 0.5,
-                    pointerEvents: 'none',
-                  }
-                }
-              },
-              // 四角红色点缀
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    top: '15px',
-                    left: '15px',
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: COLORS.accentRed,
-                  }
-                }
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    top: '15px',
-                    right: '15px',
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: COLORS.accentRed,
-                  }
-                }
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    bottom: '15px',
-                    left: '15px',
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: COLORS.accentRed,
-                  }
-                }
-              },
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    bottom: '15px',
-                    right: '15px',
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: COLORS.accentRed,
-                  }
-                }
-              },
-              children
-            ]
-          }
-        }
-      ]
+  return React.createElement('div', {
+    style: {
+      display: 'flex',
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      backgroundColor: COLORS.frameBlack,
+      position: 'relative',
+      padding: '25px',
     }
-  };
+  },
+    // 内容区
+    React.createElement('div', {
+      style: {
+        flex: 1,
+        backgroundColor: COLORS.paperBg,
+        margin: '25px',
+        padding: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+        position: 'relative',
+      }
+    },
+      // 内边框（灰色细线）
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          inset: '15px',
+          border: '1px solid #e5e5e5',
+          opacity: 0.5,
+          pointerEvents: 'none',
+        }
+      }),
+      // 四角红色点缀
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          top: '15px',
+          left: '15px',
+          width: '8px',
+          height: '8px',
+          backgroundColor: COLORS.accentRed,
+        }
+      }),
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          top: '15px',
+          right: '15px',
+          width: '8px',
+          height: '8px',
+          backgroundColor: COLORS.accentRed,
+        }
+      }),
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          bottom: '15px',
+          left: '15px',
+          width: '8px',
+          height: '8px',
+          backgroundColor: COLORS.accentRed,
+        }
+      }),
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          bottom: '15px',
+          right: '15px',
+          width: '8px',
+          height: '8px',
+          backgroundColor: COLORS.accentRed,
+        }
+      }),
+      ...(Array.isArray(children) ? children : [children])
+    )
+  );
 };

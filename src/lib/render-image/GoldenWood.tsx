@@ -1,6 +1,8 @@
 // 金丝楠木 (Golden Wood) - 精简优化版
 // 设计理念：温润典雅，浅色木纹，尊贵气质
 
+import React from 'react';
+
 export interface MountingProps {
   children: any;
   width?: number;
@@ -24,133 +26,103 @@ const RUYI_CORNER = "M10,30 Q10,10 30,10 Q50,10 50,30 Q50,50 30,50 Q10,50 10,30"
 
 const InlayCorner = ({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) => {
   const rotations = { tl: 0, tr: 90, bl: -90, br: 180 };
-  return {
-    type: 'div',
-    props: {
-      style: {
-        display: 'flex',
-        position: 'absolute',
-        width: '50px',
-        height: '50px',
-        [position.includes('t') ? 'top' : 'bottom']: '5px',
-        [position.includes('l') ? 'left' : 'right']: '5px',
-      },
-      children: [{
-        type: 'svg',
-        props: {
-          width: '100%',
-          height: '100%',
-          viewBox: '0 0 60 60',
-          style: { transform: `rotate(${rotations[position]}deg)` },
-          children: [
-            {
-              type: 'path',
-              props: {
-                d: RUYI_CORNER,
-                stroke: COLORS.goldInlay,
-                strokeWidth: '2.5',
-                fill: 'none',
-                opacity: 0.7,
-              }
-            },
-            // 内圆点
-            {
-              type: 'circle',
-              props: {
-                cx: '30',
-                cy: '30',
-                r: '4',
-                fill: COLORS.goldInlay,
-                opacity: 0.5,
-              }
-            }
-          ]
-        }
-      }]
-    }
+  const style: any = {
+    display: 'flex',
+    position: 'absolute',
+    width: '50px',
+    height: '50px',
+    [position.includes('t') ? 'top' : 'bottom']: '5px',
+    [position.includes('l') ? 'left' : 'right']: '5px',
   };
+
+  return React.createElement('div', { style },
+    React.createElement('svg', {
+      width: '100%',
+      height: '100%',
+      viewBox: '0 0 60 60',
+      style: { transform: `rotate(${rotations[position]}deg)` },
+    },
+      React.createElement('path', {
+        d: RUYI_CORNER,
+        stroke: COLORS.goldInlay,
+        strokeWidth: '2.5',
+        fill: 'none',
+        opacity: 0.7,
+      }),
+      React.createElement('circle', {
+        cx: '30',
+        cy: '30',
+        r: '4',
+        fill: COLORS.goldInlay,
+        opacity: 0.5,
+      })
+    )
+  );
 };
 
 export const GoldenWood = ({ children }: MountingProps) => {
-  return {
-    type: 'div',
-    props: {
-      style: {
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        backgroundColor: COLORS.woodBase,
-        position: 'relative',
-        padding: '35px',
-        boxShadow: 'inset 0 0 50px rgba(0,0,0,0.2)',
-      },
-      children: [
-        // 木纹层
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              inset: 0,
-              background: woodGrainGradient,
-              opacity: 0.4,
-              pointerEvents: 'none',
-            }
-          }
-        },
-        // 金色内边框线
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              inset: '30px',
-              border: `2px solid ${COLORS.goldInlay}`,
-              opacity: 0.5,
-              pointerEvents: 'none',
-            }
-          }
-        },
-        // 四角镶嵌装饰
-        InlayCorner({ position: 'tl' }),
-        InlayCorner({ position: 'tr' }),
-        InlayCorner({ position: 'bl' }),
-        InlayCorner({ position: 'br' }),
-        // 内容区
-        {
-          type: 'div',
-          props: {
-            style: {
-              flex: 1,
-              backgroundColor: COLORS.paperBg,
-              margin: '35px',
-              padding: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 6px 25px rgba(0,0,0,0.25)',
-              position: 'relative',
-            },
-            children: [
-              // 内装饰框
-              {
-                type: 'div',
-                props: {
-                  style: {
-                    position: 'absolute',
-                    inset: '20px',
-                    border: `1px solid ${COLORS.innerAccent}`,
-                    opacity: 0.3,
-                    pointerEvents: 'none',
-                  }
-                }
-              },
-              children
-            ]
-          }
-        }
-      ]
+  return React.createElement('div', {
+    style: {
+      display: 'flex',
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      backgroundColor: COLORS.woodBase,
+      position: 'relative',
+      padding: '35px',
+      boxShadow: 'inset 0 0 50px rgba(0,0,0,0.2)',
     }
-  };
+  },
+    // 木纹层
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        inset: 0,
+        background: woodGrainGradient,
+        opacity: 0.4,
+        pointerEvents: 'none',
+      }
+    }),
+    // 金色内边框线
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        inset: '30px',
+        border: `2px solid ${COLORS.goldInlay}`,
+        opacity: 0.5,
+        pointerEvents: 'none',
+      }
+    }),
+    // 四角镶嵌装饰
+    InlayCorner({ position: 'tl' }),
+    InlayCorner({ position: 'tr' }),
+    InlayCorner({ position: 'bl' }),
+    InlayCorner({ position: 'br' }),
+    // 内容区
+    React.createElement('div', {
+      style: {
+        flex: 1,
+        backgroundColor: COLORS.paperBg,
+        margin: '35px',
+        padding: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 6px 25px rgba(0,0,0,0.25)',
+        position: 'relative',
+      }
+    },
+      // 内装饰框
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          inset: '20px',
+          border: `1px solid ${COLORS.innerAccent}`,
+          opacity: 0.3,
+          pointerEvents: 'none',
+        }
+      }),
+      ...(Array.isArray(children) ? children : [children])
+    )
+  );
 };

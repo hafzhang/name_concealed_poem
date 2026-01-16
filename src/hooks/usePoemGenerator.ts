@@ -74,7 +74,7 @@ export const getProcessedName = (originalName: string, lineCount: number): strin
  */
 export const usePoemGenerator = (): UsePoemGeneratorReturn => {
   // 行数选择（默认4行）
-  const [lineCount, setLineCount] = useState<number>(4);
+  const [lineCount, setLineCountState] = useState<number>(4);
 
   // 风格关键词选择
   const [styleKeyword, setStyleKeyword] = useState<string>('');
@@ -92,6 +92,12 @@ export const usePoemGenerator = (): UsePoemGeneratorReturn => {
       ...prev,
       [category]: !prev[category]
     }));
+  }, []);
+
+  const setLineCount = useCallback((count: number) => {
+    if (count === 2 || count === 4 || count === 6) {
+      setLineCountState(count);
+    }
   }, []);
 
   /**

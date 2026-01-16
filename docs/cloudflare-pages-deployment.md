@@ -364,7 +364,7 @@ wrangler pages deploy .vercel/output/static --project-name=your-project-name
 AI_API_KEY=your_openai_api_key
 AI_BASE_URL=your_api_base_url
 AI_MODEL_NAME=gpt-4
-AI_TIMEOUT=60000
+AI_TIMEOUT=120000
 ```
 
 ---

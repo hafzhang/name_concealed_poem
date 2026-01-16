@@ -36,153 +36,122 @@ const CLOUD_PATTERNS = [
 
 const CloudBorder = ({ side }: { side: 'top' | 'bottom' | 'left' | 'right' }) => {
   const isHorizontal = side === 'top' || side === 'bottom';
-  return {
-    type: 'div',
-    props: {
-      style: {
-        position: 'absolute',
-        [side]: 0,
-        [isHorizontal ? 'left' : 'top']: 0,
-        [isHorizontal ? 'right' : 'bottom']: 0,
-        [isHorizontal ? 'height' : 'width']: '50px',
-        background: `linear-gradient(${side === 'top' ? 'to bottom' : side === 'bottom' ? 'to top' : 'to right'}, ${COLORS.brocadeMain}, ${COLORS.brocadeLight})`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        overflow: 'hidden',
-      },
-      children: Array.from({ length: 8 }, (_, i) => ({
-        type: 'svg',
-        props: {
-          key: i,
-          width: '40',
-          height: '40',
-          viewBox: '0 0 80 50',
-          style: {
-            opacity: 0.25,
-            transform: isHorizontal ? 'rotate(0deg)' : `rotate(${side === 'left' ? 90 : -90}deg)`,
-          },
-          children: [{
-            type: 'path',
-            props: {
-              d: CLOUD_PATTERNS[i % CLOUD_PATTERNS.length],
-              stroke: COLORS.goldAccent,
-              strokeWidth: '2',
-              fill: 'none',
-            }
-          }]
-        }
-      }))
-    }
+  const style: any = {
+    position: 'absolute',
+    [side]: 0,
+    [isHorizontal ? 'left' : 'top']: 0,
+    [isHorizontal ? 'right' : 'bottom']: 0,
+    [isHorizontal ? 'height' : 'width']: '50px',
+    background: `linear-gradient(${side === 'top' ? 'to bottom' : side === 'bottom' ? 'to top' : 'to right'}, ${COLORS.brocadeMain}, ${COLORS.brocadeLight})`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    overflow: 'hidden',
   };
+
+  return React.createElement('div', { style },
+    ...Array.from({ length: 8 }, (_, i) =>
+      React.createElement('svg', {
+        key: i,
+        width: '40',
+        height: '40',
+        viewBox: '0 0 80 50',
+        style: {
+          opacity: 0.25,
+          transform: isHorizontal ? 'rotate(0deg)' : `rotate(${side === 'left' ? 90 : -90}deg)`,
+        },
+      }, React.createElement('path', {
+        d: CLOUD_PATTERNS[i % CLOUD_PATTERNS.length],
+        stroke: COLORS.goldAccent,
+        strokeWidth: '2',
+        fill: 'none',
+      }))
+    )
+  );
 };
 
-const CornerDecoration = () => ({
-  type: 'div',
-  props: {
+const CornerDecoration = () =>
+  React.createElement('div', {
     style: {
       display: 'flex',
       position: 'absolute',
       width: '40px',
       height: '40px',
-    },
-    children: [
-      // 金色角纹
-      {
-        type: 'svg',
-        props: {
-          width: '100%',
-          height: '100%',
-          viewBox: '0 0 40 40',
-          children: [{
-            type: 'path',
-            props: {
-              d: 'M5,5 L35,5 L35,35',
-              stroke: COLORS.goldAccent,
-              strokeWidth: '3',
-              fill: 'none',
-              opacity: 0.6,
-            }
-          }]
-        }
-      },
-      // 内角装饰
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            top: '8px',
-            left: '8px',
-            width: '15px',
-            height: '15px',
-            border: `2px solid ${COLORS.innerBorder}`,
-            borderRadius: '2px',
-          }
-        }
+    }
+  },
+    // 金色角纹
+    React.createElement('svg', {
+      width: '100%',
+      height: '100%',
+      viewBox: '0 0 40 40',
+    }, React.createElement('path', {
+      d: 'M5,5 L35,5 L35,35',
+      stroke: COLORS.goldAccent,
+      strokeWidth: '3',
+      fill: 'none',
+      opacity: 0.6,
+    })),
+    // 内角装饰
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        top: '8px',
+        left: '8px',
+        width: '15px',
+        height: '15px',
+        border: `2px solid ${COLORS.innerBorder}`,
+        borderRadius: '2px',
       }
-    ]
-  }
-});
+    })
+  );
 
 export const CloudBrocade = ({ children }: MountingProps) => {
-  return {
-    type: 'div',
-    props: {
-      style: {
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        backgroundColor: COLORS.brocadeMain,
-        position: 'relative',
-        padding: '50px',
-      },
-      children: [
-        // 四周边框
-        CloudBorder({ side: 'top' }),
-        CloudBorder({ side: 'bottom' }),
-        CloudBorder({ side: 'left' }),
-        CloudBorder({ side: 'right' }),
-        // 四角装饰
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', top: '50px', left: '50px' }, children: CornerDecoration() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', top: '50px', right: '50px', transform: 'scaleX(-1)' }, children: CornerDecoration() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', bottom: '50px', left: '50px', transform: 'scaleY(-1)' }, children: CornerDecoration() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', bottom: '50px', right: '50px', transform: 'scale(-1,-1)' }, children: CornerDecoration() } },
-        // 内边框
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              top: '50px',
-              left: '50px',
-              right: '50px',
-              bottom: '50px',
-              border: `3px solid ${COLORS.innerBorder}`,
-              borderRadius: '4px',
-              pointerEvents: 'none',
-            }
-          }
-        },
-        // 内容区
-        {
-          type: 'div',
-          props: {
-            style: {
-              flex: 1,
-              backgroundColor: COLORS.paperBg,
-              margin: '50px',
-              padding: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-            },
-            children
-          }
-        }
-      ]
+  return React.createElement('div', {
+    style: {
+      display: 'flex',
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      backgroundColor: COLORS.brocadeMain,
+      position: 'relative',
+      padding: '50px',
     }
-  };
+  },
+    // 四周边框
+    CloudBorder({ side: 'top' }),
+    CloudBorder({ side: 'bottom' }),
+    CloudBorder({ side: 'left' }),
+    CloudBorder({ side: 'right' }),
+    // 四角装饰
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', top: '50px', left: '50px' } }, CornerDecoration()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', top: '50px', right: '50px', transform: 'scaleX(-1)' } }, CornerDecoration()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', bottom: '50px', left: '50px', transform: 'scaleY(-1)' } }, CornerDecoration()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', bottom: '50px', right: '50px', transform: 'scale(-1,-1)' } }, CornerDecoration()),
+    // 内边框
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        top: '50px',
+        left: '50px',
+        right: '50px',
+        bottom: '50px',
+        border: `3px solid ${COLORS.innerBorder}`,
+        borderRadius: '4px',
+        pointerEvents: 'none',
+      }
+    }),
+    // 内容区
+    React.createElement('div', {
+      style: {
+        flex: 1,
+        backgroundColor: COLORS.paperBg,
+        margin: '50px',
+        padding: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+      }
+    }, ...(Array.isArray(children) ? children : [children]))
+  );
 };

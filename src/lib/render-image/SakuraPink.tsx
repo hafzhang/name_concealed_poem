@@ -20,71 +20,52 @@ const COLORS = {
 // 简化的樱花花瓣
 const SAKURA_PETAL = "M20,30 Q15,20 20,10 Q25,20 20,30 M20,10 Q20,5 25,8 M20,10 Q20,5 15,8";
 
-const SakuraFlower = () => ({
-  type: 'svg',
-  props: {
+const SakuraFlower = () =>
+  React.createElement('svg', {
     width: '40',
     height: '40',
     viewBox: '0 0 40 40',
-    children: [
-      // 主花瓣
-      {
-        type: 'path',
-        props: {
-          d: "M20,35 C15,30 10,25 10,15 C10,5 30,5 30,15 C30,25 25,30 20,35",
-          fill: COLORS.sakuraMain,
-          opacity: 0.6,
-        }
-      },
-      // 花蕊
-      {
-        type: 'circle',
-        props: {
-          cx: '20',
-          cy: '20',
-          r: '3',
-          fill: COLORS.sakuraDark,
-          opacity: 0.5,
-        }
-      },
-      // 花蕊点
-      {
-        type: 'circle',
-        props: {
-          cx: '12',
-          cy: '18',
-          r: '1.5',
-          fill: COLORS.sakuraDark,
-          opacity: 0.4,
-        }
-      },
-      {
-        type: 'circle',
-        props: {
-          cx: '28',
-          cy: '18',
-          r: '1.5',
-          fill: COLORS.sakuraDark,
-          opacity: 0.4,
-        }
-      },
-      {
-        type: 'circle',
-        props: {
-          cx: '20',
-          cy: '28',
-          r: '1.5',
-          fill: COLORS.sakuraDark,
-          opacity: 0.4,
-        }
-      }
-    ]
-  }
-});
+  },
+    // 主花瓣
+    React.createElement('path', {
+      d: "M20,35 C15,30 10,25 10,15 C10,5 30,5 30,15 C30,25 25,30 20,35",
+      fill: COLORS.sakuraMain,
+      opacity: 0.6,
+    }),
+    // 花蕊
+    React.createElement('circle', {
+      cx: '20',
+      cy: '20',
+      r: '3',
+      fill: COLORS.sakuraDark,
+      opacity: 0.5,
+    }),
+    // 花蕊点
+    React.createElement('circle', {
+      cx: '12',
+      cy: '18',
+      r: '1.5',
+      fill: COLORS.sakuraDark,
+      opacity: 0.4,
+    }),
+    React.createElement('circle', {
+      cx: '28',
+      cy: '18',
+      r: '1.5',
+      fill: COLORS.sakuraDark,
+      opacity: 0.4,
+    }),
+    React.createElement('circle', {
+      cx: '20',
+      cy: '28',
+      r: '1.5',
+      fill: COLORS.sakuraDark,
+      opacity: 0.4,
+    })
+  );
 
-const SakuraBorder = () => ({
-  type: 'div',
-  props: {
+const SakuraBorder = () =>
+  React.createElement('div', {
     style: {
       position: 'absolute',
       inset: '25px',
@@ -92,91 +73,72 @@ const SakuraBorder = () => ({
       borderRadius: '8px',
       pointerEvents: 'none',
     }
-  }
-});
+  });
 
 export const SakuraPink = ({ children }: MountingProps) => {
-  return {
-    type: 'div',
-    props: {
+  return React.createElement('div', {
+    style: {
+      display: 'flex',
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      backgroundColor: COLORS.sakuraLight,
+      position: 'relative',
+      padding: '30px',
+    }
+  },
+    // 樱花渐变背景
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        inset: 0,
+        background: `linear-gradient(135deg, ${COLORS.sakuraLight}, ${COLORS.sakuraMain}, ${COLORS.sakuraLight})`,
+        opacity: 0.5,
+        pointerEvents: 'none',
+      }
+    }),
+    // 四角樱花装饰
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', top: '35px', left: '35px' } }, SakuraFlower()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', top: '35px', right: '35px' } }, SakuraFlower()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', bottom: '35px', left: '35px' } }, SakuraFlower()),
+    React.createElement('div', { style: { display: 'flex', position: 'absolute', bottom: '35px', right: '35px' } }, SakuraFlower()),
+    // 漂浮花瓣（顶部）
+    React.createElement('div', {
       style: {
         display: 'flex',
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        backgroundColor: COLORS.sakuraLight,
-        position: 'relative',
-        padding: '30px',
-      },
-      children: [
-        // 樱花渐变背景
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              inset: 0,
-              background: `linear-gradient(135deg, ${COLORS.sakuraLight}, ${COLORS.sakuraMain}, ${COLORS.sakuraLight})`,
-              opacity: 0.5,
-              pointerEvents: 'none',
-            }
-          }
-        },
-        // 四角樱花装饰
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', top: '35px', left: '35px' }, children: SakuraFlower() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', top: '35px', right: '35px' }, children: SakuraFlower() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', bottom: '35px', left: '35px' }, children: SakuraFlower() } },
-        { type: 'div', props: { style: { display: 'flex', position: 'absolute', bottom: '35px', right: '35px' }, children: SakuraFlower() } },
-        // 漂浮花瓣（顶部）
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              position: 'absolute',
-              top: '60px',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              opacity: 0.4,
-            },
-            children: SakuraFlower()
-          }
-        },
-        // 樱花边框
-        SakuraBorder(),
-        // 内边框
-        {
-          type: 'div',
-          props: {
-            style: {
-              position: 'absolute',
-              inset: '31px',
-              border: `1px dashed ${COLORS.sakuraDark}`,
-              borderRadius: '6px',
-              opacity: 0.3,
-              pointerEvents: 'none',
-            }
-          }
-        },
-        // 内容区
-        {
-          type: 'div',
-          props: {
-            style: {
-              flex: 1,
-              backgroundColor: COLORS.paperBg,
-              margin: '30px',
-              padding: '50px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 30px rgba(244,114,182,0.2)',
-              borderRadius: '8px',
-            },
-            children
-          }
-        }
-      ]
-    }
-  };
+        position: 'absolute',
+        top: '60px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        opacity: 0.4,
+      }
+    }, SakuraFlower()),
+    // 樱花边框
+    SakuraBorder(),
+    // 内边框
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        inset: '31px',
+        border: `1px dashed ${COLORS.sakuraDark}`,
+        borderRadius: '6px',
+        opacity: 0.3,
+        pointerEvents: 'none',
+      }
+    }),
+    // 内容区
+    React.createElement('div', {
+      style: {
+        flex: 1,
+        backgroundColor: COLORS.paperBg,
+        margin: '30px',
+        padding: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 8px 30px rgba(244,114,182,0.2)',
+        borderRadius: '8px',
+      }
+    }, ...(Array.isArray(children) ? children : [children]))
+  );
 };

@@ -24,7 +24,11 @@ const mockLocalStorage = {
   clear: jest.fn(),
 };
 
-global.localStorage = mockLocalStorage as any;
+Object.defineProperty(global, 'localStorage', {
+  value: mockLocalStorage,
+  writable: true,
+  configurable: true,
+});
 
 describe('useImageCache - 图片缓存 Hook', () => {
   beforeEach(() => {

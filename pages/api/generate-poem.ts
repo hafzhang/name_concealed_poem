@@ -62,7 +62,7 @@ export default async function handler(req: Request) {
     const apiKey = process.env.AI_API_KEY || process.env.API_KEY || '';
     const baseURL = process.env.AI_BASE_URL || 'https://api.openai.com/v1';
     const modelName = process.env.AI_MODEL_NAME || 'gpt-4';
-    const timeout = parseInt(process.env.AI_TIMEOUT || '60000', 10);
+    const timeout = parseInt(process.env.AI_TIMEOUT || '120000', 10);
 
     // Check if API key is configured
     if (!apiKey) {
@@ -77,9 +77,13 @@ export default async function handler(req: Request) {
     }
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    let didTimeout = false;
+    const timeoutId = setTimeout(() => {
+      didTimeout = true;
+      controller.abort();
+    }, timeout);
 
-    let response;
+    let response: Response;
     try {
       response = await fetch(`${baseURL}/chat/completions`, {
         method: 'POST',
@@ -99,7 +103,16 @@ export default async function handler(req: Request) {
         signal: controller.signal,
       });
     } catch (fetchError: any) {
-      console.error('Fetch error:', fetchError);
+      clearTimeout(timeoutId);
+      if (fetchError?.name === 'AbortError') {
+        return new Response(JSON.stringify({
+          success: false,
+          error: didTimeout ? 'AI 请求超时，请重试' : '请求已取消'
+        }), {
+          status: didTimeout ? 504 : 499,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
       return new Response(JSON.stringify({
         success: false,
         error: `Failed to connect to AI service: ${fetchError.message || 'Unknown error'}`
@@ -107,9 +120,9 @@ export default async function handler(req: Request) {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();

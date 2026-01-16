@@ -1,6 +1,8 @@
 // 绫罗卷轴 (Silk Scroll) - 精简优化版
 // 设计理念：传统中式挂轴，简化装饰，突出书法主体
 
+import React from 'react';
+
 export interface MountingProps {
   children: any;
   width?: number;
@@ -33,9 +35,8 @@ const CLOUD_PATTERNS = [
 // --- 辅助组件 ---
 
 // 渲染挂绳
-const RenderHangingString = () => ({
-  type: 'div',
-  props: {
+const RenderHangingString = () =>
+  React.createElement('div', {
     style: {
       position: 'absolute',
       top: '-60px',
@@ -47,13 +48,11 @@ const RenderHangingString = () => ({
       background: `linear-gradient(to bottom, ${COLORS.string}, transparent)`,
       zIndex: 100,
     }
-  }
-});
+  });
 
 // 渲染顶部卷轴
-const RenderTopRoller = () => ({
-  type: 'div',
-  props: {
+const RenderTopRoller = () =>
+  React.createElement('div', {
     style: {
       display: 'flex',
       width: '100%',
@@ -61,63 +60,51 @@ const RenderTopRoller = () => ({
       background: `linear-gradient(to bottom, ${COLORS.rollerLight}, ${COLORS.rollerDark})`,
       boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
       position: 'relative',
-    },
-    children: [
-      // 左轴头
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            left: '-10px',
-            top: '-6px',
-            width: '20px',
-            height: '36px',
-            background: `linear-gradient(to right, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
-            borderRadius: '4px',
-            boxShadow: '-2px 0 4px rgba(0,0,0,0.3)',
-          }
-        }
-      },
-      // 右轴头
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            right: '-10px',
-            top: '-6px',
-            width: '20px',
-            height: '36px',
-            background: `linear-gradient(to left, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
-            borderRadius: '4px',
-            boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
-          }
-        }
-      },
-      // 金色装饰线
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            bottom: '2px',
-            left: '0',
-            right: '0',
-            height: '2px',
-            background: COLORS.goldAccent,
-            opacity: 0.6,
-          }
-        }
+    }
+  },
+    // 左轴头
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        left: '-10px',
+        top: '-6px',
+        width: '20px',
+        height: '36px',
+        background: `linear-gradient(to right, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
+        borderRadius: '4px',
+        boxShadow: '-2px 0 4px rgba(0,0,0,0.3)',
       }
-    ]
-  }
-});
+    }),
+    // 右轴头
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        right: '-10px',
+        top: '-6px',
+        width: '20px',
+        height: '36px',
+        background: `linear-gradient(to left, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
+        borderRadius: '4px',
+        boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
+      }
+    }),
+    // 金色装饰线
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        bottom: '2px',
+        left: '0',
+        right: '0',
+        height: '2px',
+        background: COLORS.goldAccent,
+        opacity: 0.6,
+      }
+    })
+  );
 
 // 渲染顶部绫罗面板
-const RenderTopSilkPanel = () => ({
-  type: 'div',
-  props: {
+const RenderTopSilkPanel = () =>
+  React.createElement('div', {
     style: {
       width: '100%',
       height: '60px',
@@ -127,62 +114,47 @@ const RenderTopSilkPanel = () => ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    children: [
-      // 精简云纹装饰 (中央)
-      {
-        type: 'div',
-        props: {
-          style: {
-            display: 'flex',
-            position: 'absolute',
-            width: '120px',
-            height: '40px',
-            opacity: 0.15,
-          },
-          children: CLOUD_PATTERNS.slice(0, 4).map((path, i) => ({
-            type: 'svg',
-            props: {
-              key: i,
-              width: '100%',
-              height: '100%',
-              viewBox: '0 0 100 50',
-              children: [{
-                type: 'path',
-                props: {
-                  d: path,
-                  stroke: COLORS.goldAccent,
-                  strokeWidth: '1.5',
-                  fill: 'none',
-                  transform: `translate(${(i % 2) * 20}, ${Math.floor(i / 2) * 10})`,
-                }
-              }]
-            }
-          }))
-        }
-      },
-      // 金色边框线
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            bottom: 0,
-            left: '0',
-            right: '0',
-            height: '3px',
-            background: `linear-gradient(to right, transparent, ${COLORS.goldAccent} 20%, ${COLORS.goldAccent} 80%, transparent)`,
-          }
-        }
+    }
+  },
+    // 精简云纹装饰 (中央)
+    React.createElement('div', {
+      style: {
+        display: 'flex',
+        position: 'absolute',
+        width: '120px',
+        height: '40px',
+        opacity: 0.15,
       }
-    ]
-  }
-});
+    }, CLOUD_PATTERNS.slice(0, 4).map((path, i) =>
+      React.createElement('svg', {
+        key: i,
+        width: '100%',
+        height: '100%',
+        viewBox: '0 0 100 50',
+      }, React.createElement('path', {
+        d: path,
+        stroke: COLORS.goldAccent,
+        strokeWidth: '1.5',
+        fill: 'none',
+        transform: `translate(${(i % 2) * 20}, ${Math.floor(i / 2) * 10})`,
+      }))
+    )),
+    // 金色边框线
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        bottom: 0,
+        left: '0',
+        right: '0',
+        height: '3px',
+        background: `linear-gradient(to right, transparent, ${COLORS.goldAccent} 20%, ${COLORS.goldAccent} 80%, transparent)`,
+      }
+    })
+  );
 
 // 渲染中间宣纸内容区
-const RenderPaperContent = (children: any) => ({
-  type: 'div',
-  props: {
+const RenderPaperContent = (children: any) =>
+  React.createElement('div', {
     style: {
       flex: 1,
       backgroundColor: COLORS.paperBg,
@@ -193,15 +165,12 @@ const RenderPaperContent = (children: any) => ({
       padding: '40px',
       margin: '0 20px',
       boxShadow: 'inset 0 0 30px rgba(0,0,0,0.05)',
-    },
-    children
-  }
-});
+    }
+  }, ...Array.isArray(children) ? children : [children]);
 
 // 渲染底部绫罗面板
-const RenderBottomSilkPanel = () => ({
-  type: 'div',
-  props: {
+const RenderBottomSilkPanel = () =>
+  React.createElement('div', {
     style: {
       width: '100%',
       height: '60px',
@@ -211,62 +180,47 @@ const RenderBottomSilkPanel = () => ({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-    },
-    children: [
-      // 精简云纹装饰 (中央)
-      {
-        type: 'div',
-        props: {
-          style: {
-            display: 'flex',
-            position: 'absolute',
-            width: '120px',
-            height: '40px',
-            opacity: 0.15,
-          },
-          children: CLOUD_PATTERNS.slice(4, 8).map((path, i) => ({
-            type: 'svg',
-            props: {
-              key: i,
-              width: '100%',
-              height: '100%',
-              viewBox: '0 0 100 50',
-              children: [{
-                type: 'path',
-                props: {
-                  d: path,
-                  stroke: COLORS.goldAccent,
-                  strokeWidth: '1.5',
-                  fill: 'none',
-                  transform: `translate(${(i % 2) * 20}, ${Math.floor(i / 2) * 10})`,
-                }
-              }]
-            }
-          }))
-        }
-      },
-      // 金色边框线
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            top: 0,
-            left: '0',
-            right: '0',
-            height: '3px',
-            background: `linear-gradient(to right, transparent, ${COLORS.goldAccent} 20%, ${COLORS.goldAccent} 80%, transparent)`,
-          }
-        }
+    }
+  },
+    // 精简云纹装饰 (中央)
+    React.createElement('div', {
+      style: {
+        display: 'flex',
+        position: 'absolute',
+        width: '120px',
+        height: '40px',
+        opacity: 0.15,
       }
-    ]
-  }
-});
+    }, CLOUD_PATTERNS.slice(4, 8).map((path, i) =>
+      React.createElement('svg', {
+        key: i,
+        width: '100%',
+        height: '100%',
+        viewBox: '0 0 100 50',
+      }, React.createElement('path', {
+        d: path,
+        stroke: COLORS.goldAccent,
+        strokeWidth: '1.5',
+        fill: 'none',
+        transform: `translate(${(i % 2) * 20}, ${Math.floor(i / 2) * 10})`,
+      }))
+    )),
+    // 金色边框线
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        top: 0,
+        left: '0',
+        right: '0',
+        height: '3px',
+        background: `linear-gradient(to right, transparent, ${COLORS.goldAccent} 20%, ${COLORS.goldAccent} 80%, transparent)`,
+      }
+    })
+  );
 
 // 渲染底部卷轴
-const RenderBottomRoller = () => ({
-  type: 'div',
-  props: {
+const RenderBottomRoller = () =>
+  React.createElement('div', {
     style: {
       display: 'flex',
       width: '100%',
@@ -274,111 +228,81 @@ const RenderBottomRoller = () => ({
       background: `linear-gradient(to top, ${COLORS.rollerLight}, ${COLORS.rollerDark})`,
       boxShadow: '0 -2px 4px rgba(0,0,0,0.2)',
       position: 'relative',
-    },
-    children: [
-      // 左轴头
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            left: '-10px',
-            top: '-6px',
-            width: '20px',
-            height: '36px',
-            background: `linear-gradient(to right, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
-            borderRadius: '4px',
-            boxShadow: '-2px 0 4px rgba(0,0,0,0.3)',
-          }
-        }
-      },
-      // 右轴头
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            right: '-10px',
-            top: '-6px',
-            width: '20px',
-            height: '36px',
-            background: `linear-gradient(to left, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
-            borderRadius: '4px',
-            boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
-          }
-        }
-      },
-      // 金色装饰线
-      {
-        type: 'div',
-        props: {
-          style: {
-            position: 'absolute',
-            top: '2px',
-            left: '0',
-            right: '0',
-            height: '2px',
-            background: COLORS.goldAccent,
-            opacity: 0.6,
-          }
-        }
+    }
+  },
+    // 左轴头
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        left: '-10px',
+        top: '-6px',
+        width: '20px',
+        height: '36px',
+        background: `linear-gradient(to right, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
+        borderRadius: '4px',
+        boxShadow: '-2px 0 4px rgba(0,0,0,0.3)',
       }
-    ]
-  }
-});
+    }),
+    // 右轴头
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        right: '-10px',
+        top: '-6px',
+        width: '20px',
+        height: '36px',
+        background: `linear-gradient(to left, ${COLORS.rollerDark}, ${COLORS.rollerLight})`,
+        borderRadius: '4px',
+        boxShadow: '2px 0 4px rgba(0,0,0,0.3)',
+      }
+    }),
+    // 金色装饰线
+    React.createElement('div', {
+      style: {
+        position: 'absolute',
+        top: '2px',
+        left: '0',
+        right: '0',
+        height: '2px',
+        background: COLORS.goldAccent,
+        opacity: 0.6,
+      }
+    })
+  );
 
 // --- 主组件 ---
 export const SilkScroll = ({ children }: MountingProps) => {
-  return {
-    type: 'div',
-    props: {
+  return React.createElement('div', {
+    style: {
+      display: 'flex',
+      width: '100%',
+      height: '100%',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+      backgroundColor: '#f5f5f4',
+      position: 'relative',
+      overflow: 'hidden',
+    }
+  },
+    // 顶部组件
+    React.createElement('div', {
       style: {
         display: 'flex',
-        width: '100%',
-        height: '100%',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        backgroundColor: '#f5f5f4',
-        position: 'relative',
-        overflow: 'hidden',
-      },
-      children: [
-        // 顶部组件
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              zIndex: 10,
-            },
-            children: [
-              RenderHangingString(),
-              RenderTopRoller(),
-              RenderTopSilkPanel(),
-            ]
-          }
-        },
-        // 中间宣纸
-        RenderPaperContent(children),
-        // 底部组件
-        {
-          type: 'div',
-          props: {
-            style: {
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              zIndex: 10,
-            },
-            children: [
-              RenderBottomSilkPanel(),
-              RenderBottomRoller(),
-            ]
-          }
-        }
-      ]
-    }
-  };
+        width: '100%',
+        zIndex: 10,
+      }
+    }, RenderHangingString(), RenderTopRoller(), RenderTopSilkPanel()),
+    // 中间宣纸
+    RenderPaperContent(children),
+    // 底部组件
+    React.createElement('div', {
+      style: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        zIndex: 10,
+      }
+    }, RenderBottomSilkPanel(), RenderBottomRoller())
+  );
 };
