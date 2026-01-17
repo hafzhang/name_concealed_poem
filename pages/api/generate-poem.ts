@@ -1,3 +1,5 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 const styleMap: Record<string, string> = {
   'kaishu': '端正平实',
   'xingshu': '飘逸洒脱',
@@ -7,27 +9,40 @@ const styleMap: Record<string, string> = {
   'niaochong': '华丽绮靡'
 };
 
-export const config = {
-  runtime: 'edge',
+type PoemResponse = {
+  success: boolean;
+  data?: {
+    poem: string[];
+    explanation: string;
+    originalName: string;
+    processedName: string;
+    lineCount: number;
+    cached: boolean;
+  };
+  error?: string;
+  raw?: string;
+  details?: string;
 };
 
-export default async function handler(req: Request) {
+// Use Node.js compatibility mode on Cloudflare (with nodejs_compat flag)
+// This avoids the edge runtime's async_hooks limitation
+export const config = {
+  runtime: 'nodejs',
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<PoemResponse>
+) {
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ success: false, error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
-    const body = await req.json();
-    const { name, originalName, style, styleKeyword, lineCount = 4 } = body;
+    const { name, originalName, style, styleKeyword, lineCount = 4 } = req.body;
 
     if (!name || name.length < 2) {
-      return new Response(JSON.stringify({ success: false, error: '名字至少需要2个字符' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return res.status(400).json({ success: false, error: '名字至少需要2个字符' });
     }
 
     const literaryStyle = styleKeyword || styleMap[style] || style || '优美';
@@ -67,12 +82,9 @@ export default async function handler(req: Request) {
     // Check if API key is configured
     if (!apiKey) {
       console.error('AI_API_KEY or API_KEY environment variable is not set');
-      return new Response(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: 'AI service not configured. Please set AI_API_KEY environment variable.'
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -105,20 +117,14 @@ export default async function handler(req: Request) {
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
       if (fetchError?.name === 'AbortError') {
-        return new Response(JSON.stringify({
+        return res.status(didTimeout ? 504 : 499).json({
           success: false,
           error: didTimeout ? 'AI 请求超时，请重试' : '请求已取消'
-        }), {
-          status: didTimeout ? 504 : 499,
-          headers: { 'Content-Type': 'application/json' }
         });
       }
-      return new Response(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: `Failed to connect to AI service: ${fetchError.message || 'Unknown error'}`
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     } finally {
       clearTimeout(timeoutId);
@@ -127,12 +133,9 @@ export default async function handler(req: Request) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI API error:', response.status, errorText);
-      return new Response(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: `AI API error: ${response.status} ${response.statusText}`
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -145,17 +148,14 @@ export default async function handler(req: Request) {
       result = JSON.parse(content);
     } catch (e) {
       console.error('Failed to parse AI response:', content);
-      return new Response(JSON.stringify({
+      return res.status(500).json({
         success: false,
         error: 'Failed to parse AI response',
         raw: content
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    return new Response(JSON.stringify({
+    return res.status(200).json({
       success: true,
       data: {
         poem: result.poem,
@@ -165,20 +165,14 @@ export default async function handler(req: Request) {
         lineCount,
         cached: false
       }
-    }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
     console.error('Error generating poem:', error);
-    return new Response(JSON.stringify({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Failed to generate poem',
       details: error.toString()
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
     });
   }
 }

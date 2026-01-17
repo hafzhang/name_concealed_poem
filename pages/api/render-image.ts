@@ -1,8 +1,16 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import React from 'react';
 import satori from 'satori';
 
+type ImageResponse = {
+  success?: boolean;
+  error?: string;
+  details?: string;
+};
+
+// Use Node.js compatibility mode on Cloudflare (with nodejs_compat flag)
 export const config = {
-  runtime: 'edge',
+  runtime: 'nodejs',
 };
 
 // Font configurations with valid font files
@@ -77,37 +85,36 @@ import { LavenderMist } from '../../src/lib/render-image/LavenderMist';
 import { ChampagneGold } from '../../src/lib/render-image/ChampagneGold';
 import { AzurePorcelain } from '../../src/lib/render-image/AzurePorcelain';
 
-export default async function handler(req: Request) {
-  // Add CORS headers and better error handling
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  // Set CORS headers
+  const setCorsHeaders = () => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   };
 
+  setCorsHeaders();
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ success: false, error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   try {
     console.log('=== Starting image rendering ===');
-    const body = await req.json();
-    const { poem, style, bg, frame, name, lineCount = 4 } = body;
+    const { poem, style, bg, frame, name, lineCount = 4 } = req.body;
 
     console.log('Request params:', { poem, style, frame, name, lineCount });
 
     if (!poem || !Array.isArray(poem) || poem.length < 2 || poem.length > 6) {
-      return new Response(JSON.stringify({ success: false, error: 'Invalid poem data' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return res.status(400).json({ success: false, error: 'Invalid poem data' });
     }
 
     console.log(`Rendering image: style=${style}, frame=${frame}, poem=${poem.length} lines`);
@@ -239,9 +246,6 @@ export default async function handler(req: Request) {
 
     const frameElement = getFrameComponent(frame);
     console.log('Frame element type:', typeof frameElement);
-    console.log('Frame element keys:', Object.keys(frameElement));
-    console.log('Frame element:', JSON.stringify(frameElement, null, 2).substring(0, 500));
-
     console.log('Calling satori with font:', fontData.name);
     const svg = await satori(
       frameElement as any,
@@ -290,16 +294,12 @@ export default async function handler(req: Request) {
 
     console.log('=== Image rendering successful ===');
 
-    return new Response(svgWithFont, {
-      status: 200,
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'image/svg+xml; charset=utf-8',
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      }
-    });
+    res.status(200);
+    res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.send(svgWithFont);
 
   } catch (error: any) {
     console.error('=== Error rendering image ===');
@@ -307,13 +307,10 @@ export default async function handler(req: Request) {
     console.error('Error message:', error.message);
     console.error('Error stack:', error.stack);
 
-    return new Response(JSON.stringify({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Failed to render image',
       details: error.stack || error.toString()
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
 }
