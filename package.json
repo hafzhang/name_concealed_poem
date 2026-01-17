@@ -2,36 +2,11 @@
   "name": "next_app",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "activationEvents": [
-    "onStartup",
-    "onCommand:trae.beautifier.start",
-    "onCommand:trae.pipeline.start"
-  ],
-  "main": "./.trae/extensions/editor-helper.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "trae.beautifier.start",
-        "title": "Beautifier: Start long-running"
-      },
-      {
-        "command": "trae.pipeline.start",
-        "title": "Pipeline: Start long-running"
-      }
-    ]
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "beautifier:start": "node ./.trae/extensions/editor-helper.js beautifier",
+    "lint": "eslint"
     "pipeline:start": "node ./.trae/extensions/editor-helper.js pipeline",
     "longrunner:start": "node ./.trae/extensions/editor-helper.js start",
     "ai:once": "node ./.trae/extensions/editor-helper.js ai",
@@ -47,6 +22,7 @@
     "@fontsource/lxgw-marker-gothic": "^5.2.2",
     "@fontsource/lxgw-wenkai": "^5.2.5",
     "@fontsource/lxgw-wenkai-tc": "^5.2.8",
+    "@resvg/resvg-js-win32-x64-msvc": "^2.6.2",
     "@fontsource/ma-shan-zheng": "^5.2.8",
     "@fontsource/noto-serif-sc": "^5.2.8",
     "@fontsource/zcool-xiaowei": "^5.2.8",
@@ -61,7 +37,6 @@
     "lucide-react": "^0.562.0",
     "lxgw-wenkai-screen-webfont": "^1.7.0",
     "next": "13.4.19",
-    "openai": "^6.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "satori": "^0.10.13",
