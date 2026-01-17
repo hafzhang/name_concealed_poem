@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
     "pipeline:start": "node ./.trae/extensions/editor-helper.js pipeline",
     "longrunner:start": "node ./.trae/extensions/editor-helper.js start",
     "ai:once": "node ./.trae/extensions/editor-helper.js ai",
