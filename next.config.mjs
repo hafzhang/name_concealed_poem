@@ -1,17 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@resvg/resvg-js'],
-  },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        'async_hooks': 'async_hooks',
-      });
-    }
-    return config;
-  },
+  // Empty config - using defaults
 };
 
 export default nextConfig;
