@@ -1,35 +1,39 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
+
 /** @type {import('next').NextConfig} */
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Mock async_hooks module for Cloudflare Workers Edge Runtime
+const asyncHooksMockPath = path.resolve(__dirname, 'mocks', 'async_hooks.js');
+
+const require = createRequire(import.meta.url);
 
 const nextConfig = {
   webpack: (config, { isServer }) => {
-    // Exclude async_hooks module from being bundled
-    // It's a Node.js built-in that doesn't work in Cloudflare Workers Edge Runtime
+    // Replace async_hooks module with a mock implementation
+    // async_hooks is a Node.js built-in that doesn't work in Cloudflare Workers Edge Runtime
 
-    // 1. Set alias to false to prevent resolution
+    // Use NormalModuleReplacementPlugin to replace all async_hooks imports with our mock
+    const { NormalModuleReplacementPlugin } = require('webpack');
+    config.plugins.push(
+      new NormalModuleReplacementPlugin(
+        /^async_hooks$/,
+        asyncHooksMockPath
+      )
+    );
+
+    // Also add alias as fallback
     config.resolve.alias = {
       ...config.resolve.alias,
-      'async_hooks': false,
+      'async_hooks': asyncHooksMockPath,
     };
 
-    // 2. For server-side builds, add to externals
-    if (isServer) {
-      config.externals = config.externals || [];
-      if (Array.isArray(config.externals)) {
-        config.externals.push('async_hooks');
-      }
-    }
-
-    // 3. Ignore async_hooks in module resolution
-    config.module = config.module || {};
-    config.module.unknownContextCritical = false;
-    config.module.unknownContextRegExp = /async_hooks/;
-
     return config;
-  },
-
-  // 4. Experimental: mark async_hooks as external package
-  experimental: {
-    serverComponentsExternalPackages: ['async_hooks'],
   },
 };
 
