@@ -1,0 +1,31 @@
+{
+  "envId": "{{envId}}",
+  "version": "2.0",
+  "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+  "framework": {
+    "name": "name-concealed-poem",
+    "plugins": {
+      "client": {
+        "use": "@cloudbase/framework-plugin-website",
+        "inputs": {
+          "buildCommand": "npm run build",
+          "outputPath": ".next"
+        }
+      },
+      "server": {
+        "use": "@cloudbase/framework-plugin-container",
+        "inputs": {
+          "containerPort": 3000,
+          "dockerfile": "./Dockerfile",
+          "cpu": 1,
+          "mem": 2,
+          "minNum": 0,
+          "maxNum": 10
+        }
+      }
+    }
+  },
+  "function": {
+    "timeout": 900
+  }
+}
