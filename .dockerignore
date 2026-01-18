@@ -32,9 +32,21 @@ build
 coverage
 .nyc_output
 
+# 测试文件
+test-*.js
+*.test.js
+*.spec.js
+
+# 临时文件
+temp_fonts
+*.log
+server.log
+
+# 构建缓存
+tsconfig.tsbuildinfo
+
 # 其他
 .DS_Store
-*.log
 README.md
 docs
 .github
