@@ -5,15 +5,11 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 package-lock.json
-COPY package*.json ./
-
-# 安装依赖
-# 使用 --legacy-peer-deps 解决依赖冲突
-RUN npm install --legacy-peer-deps
-
-# 复制项目文件
+# 先复制所有文件（包括 scripts/ 目录）
 COPY . .
+
+# 安装依赖（跳过 postinstall，CloudBase 不需要 async_hooks mock）
+RUN npm install --legacy-peer-deps --ignore-scripts
 
 # 构建项目
 RUN npm run build
