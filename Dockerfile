@@ -31,7 +31,6 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/next.config.mjs ./next.config.mjs
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/pages ./pages
-RUN npm prune --omit=dev
 EXPOSE 80
 ENV NODE_ENV=production
 ENV PORT=80
