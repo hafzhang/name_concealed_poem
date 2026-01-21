@@ -3,6 +3,8 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tencent.com/g' /etc/apk/repositorie
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY package*.json ./
+COPY scripts ./scripts
+COPY mocks ./mocks
 RUN npm config set registry https://mirrors.cloud.tencent.com/npm/
 RUN npm install --legacy-peer-deps
 
