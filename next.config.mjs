@@ -14,6 +14,13 @@ const asyncHooksMockPath = path.resolve(__dirname, 'mocks', 'async_hooks.js');
 const require = createRequire(import.meta.url);
 
 const nextConfig = {
+  // Increase static generation timeout to 10 minutes
+  staticPageGenerationTimeout: 600,
+  // Experimental: disable SWC and use Babel instead
+  experimental: {
+    esmExternals: false,
+  },
+  swcMinify: false,
   webpack: (config, { isServer }) => {
     // Replace async_hooks module with a mock implementation
     // async_hooks is a Node.js built-in that doesn't work in Cloudflare Workers Edge Runtime

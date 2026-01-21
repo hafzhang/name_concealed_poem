@@ -15,7 +15,7 @@
       "server": {
         "use": "@cloudbase/framework-plugin-container",
         "inputs": {
-          "containerPort": 3000,
+          "containerPort": 80,
           "dockerfile": "./Dockerfile",
           "cpu": 1,
           "mem": 2,

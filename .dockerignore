@@ -2,9 +2,13 @@
 node_modules
 npm-debug.log
 yarn-error.log
+package-lock.json
+
+# 构建缓存（排除以减小构建上下文）
+.next/cache/
+.next/standalone/
 
 # 构建输出
-.next
 out
 dist
 build
