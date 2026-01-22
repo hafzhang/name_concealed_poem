@@ -23,8 +23,8 @@ const FONT_CONFIG: Record<string, { path: string; name: string }> = {
   'lishu': { path: '/fonts/qingliaolishu.ttf', name: 'QingLiaoLiShu' },
   'shoujin': { path: '/fonts/ShouJin.ttf', name: 'ShouJin' },
   'niaochong': { path: '/fonts/zcool-xiaowei.woff', name: 'ZcoolXiaoWei' },
-  // WOFF2 is not supported by satori, use Marker Gothic as fallback for mianhua
-  'mianhua': { path: '/fonts/lxgw-marker-gothic.woff', name: 'LXGWMarkerGothic' },
+  // 棉花糖 · 俏皮 style
+  'mianhua': { path: '/fonts/ShanHaiMianHuaTangW-2.ttf', name: 'ShanHaiMianHuaTang' },
   'marker': { path: '/fonts/lxgw-marker-gothic.woff', name: 'LXGWMarkerGothic' },
   // Default to kaishu since it's a valid font file
   'default': { path: '/fonts/kaishu.ttf', name: 'KaiShu' },
