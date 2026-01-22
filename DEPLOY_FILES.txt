@@ -1,0 +1,50 @@
+# 部署到腾讯云服务器所需的文件列表
+
+## 需要上传到服务器的文件/目录：
+
+1. .next/          (构建产物)
+2. public/         (静态资源)
+3. node_modules/   (依赖包 - 可在服务器上运行 npm install)
+4. package.json
+5. package-lock.json
+6. next.config.mjs
+7. .env.local      (重命名为 .env)
+8. deploy.sh
+
+## 排除的文件（不要上传）：
+
+- src/
+- pages/
+- .git/
+- .next/cache/
+- README.md
+- docs/
+- mocks/
+- scripts/
+- .vscode/
+- tsconfig.json
+- tailwind.config.ts
+- 其他开发配置文件
+
+---
+
+## 部署步骤：
+
+### 1. 打包文件（在本地运行）
+powershell Compress-Archive -Path .next,public,package.json,package-lock.json,next.config.mjs,.env.local,deploy.sh -DestinationPath deploy.zip
+
+### 2. 上传到服务器
+scp deploy.zip root@你的服务器IP:/root/
+
+### 3. 在服务器上解压并部署
+ssh root@你的服务器IP
+mkdir -p /var/www/html
+cd /var/www/html
+unzip /root/deploy.zip
+mv .env.local .env
+chmod +x deploy.sh
+./deploy.sh
+
+### 4. 验证部署
+pm2 status
+pm2 logs poem-app

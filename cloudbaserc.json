@@ -19,7 +19,7 @@
           "dockerfile": "./Dockerfile",
           "cpu": 1,
           "mem": 2,
-          "minNum": 0,
+          "minNum": 1,
           "maxNum": 10
         }
       }

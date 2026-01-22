@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import React from 'react';
 import satori from 'satori';
+import path from 'path';
+import fs from 'fs';
 
 type ImageResponse = {
   success?: boolean;
@@ -43,26 +45,40 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 
 const loadFont = async (style: string): Promise<{ name: string; data: ArrayBuffer }> => {
   const config = FONT_CONFIG[style] || FONT_CONFIG['default'];
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.CF_PAGES_URL
-    ? process.env.CF_PAGES_URL
-    : 'http://localhost:3000';
 
-  const fontUrl = `${baseUrl}${config.path}`;
+  // In production, fonts are in public/fonts
+  // Remove leading slash and construct path
+  const fontFileName = path.basename(config.path);
+  const possiblePaths = [
+    path.join(process.cwd(), 'public', 'fonts', fontFileName), // public/fonts/xxx.ttf
+    path.join(process.cwd(), '.next', 'static', 'fonts', fontFileName), // .next/static/fonts/xxx.ttf
+    path.join(process.cwd(), 'fonts', fontFileName), // root fonts/xxx.ttf
+  ];
 
-  console.log(`Loading font from: ${fontUrl}`);
+  let fontPath = possiblePaths[0];
+  let fontBuffer: Buffer | null = null;
 
-  const response = await fetch(fontUrl);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch font: ${response.status} ${response.statusText}`);
+  for (const tryPath of possiblePaths) {
+    if (fs.existsSync(tryPath)) {
+      fontPath = tryPath;
+      fontBuffer = fs.readFileSync(tryPath);
+      break;
+    }
   }
 
-  const arrayBuffer = await response.arrayBuffer();
+  if (!fontBuffer) {
+    throw new Error(`Font file not found: ${config.path}. Tried paths: ${possiblePaths.join(', ')}`);
+  }
+
+  // Convert Buffer to ArrayBuffer
+  const arrayBuffer = fontBuffer.buffer.slice(
+    fontBuffer.byteOffset,
+    fontBuffer.byteOffset + fontBuffer.byteLength
+  );
 
   // Validate ArrayBuffer
   if (!arrayBuffer || arrayBuffer.byteLength === 0) {
-    throw new Error(`Font file is empty: ${fontUrl}`);
+    throw new Error(`Font file is empty: ${fontPath}`);
   }
 
   // Check minimum valid font file size (at least 1KB)
@@ -70,7 +86,7 @@ const loadFont = async (style: string): Promise<{ name: string; data: ArrayBuffe
     throw new Error(`Font file too small, possibly invalid: ${arrayBuffer.byteLength} bytes`);
   }
 
-  console.log(`Font loaded: ${config.name}, size: ${arrayBuffer.byteLength} bytes`);
+  console.log(`Font loaded: ${config.name}, size: ${arrayBuffer.byteLength} bytes from ${fontPath}`);
   return { name: config.name, data: arrayBuffer };
 };
 
